@@ -1,0 +1,16 @@
+{
+  "name": "Dhiraj Kumar Sah — Full-Stack Developer",
+  "short_name": "Dhiraj Sah",
+  "description": "Portfolio of Dhiraj Kumar Sah, a Full-Stack / MERN Stack Developer.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf6ee",
+  "theme_color": "#0e0e14",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
