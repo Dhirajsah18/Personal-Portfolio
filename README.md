@@ -2,8 +2,6 @@
 
 A personal portfolio built with Vite, React, and Tailwind CSS. This repo powers a single-page portfolio site where content is driven from `src/data.js` so you can update projects, skills, and personal details without touching the React components.
 
-**Contents:** quick start, development, editing content, deployment, and tips for customization.
-
 ---
 
 ## Quick Start
