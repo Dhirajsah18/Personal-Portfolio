@@ -128,31 +128,33 @@ const Hero = () => {
               />
             </div>
 
-            {/* Floating Tech Chips with Animated Cycling Roles (Centered on Top) */}
-            <div
-              className="glass animate-float hidden sm:flex absolute -top-6 left-1/2 -translate-x-1/2 items-center gap-2.5 px-4 py-2.5 shadow-xl z-20 whitespace-nowrap"
-              style={{ animationDelay: "0.5s" }}
-            >
-              <div className="flex items-center gap-1.5 text-cyan-400 shrink-0">
-                <FaReact size={18} />
-              </div>
-              <div className="flex items-center gap-1.5 text-emerald-400 shrink-0">
-                <FaNodeJs size={18} />
-              </div>
-              <div className="flex items-center gap-1.5 text-green-500 shrink-0">
-                <SiMongodb size={18} />
-              </div>
+            {/* Floating Tech Chips with Animated Cycling Roles (100% Centered on Top) */}
+            <div className="hidden sm:flex absolute -top-6 inset-x-0 justify-center z-20 pointer-events-none">
               <div
-                className="pl-2.5 border-l overflow-hidden h-5 flex items-center shrink-0 min-w-[140px]"
-                style={{ borderColor: "var(--glass-border)" }}
+                className="glass animate-float flex items-center gap-2.5 px-4 py-2.5 shadow-xl pointer-events-auto whitespace-nowrap"
+                style={{ animationDelay: "0.5s" }}
               >
-                <span
-                  key={roleIndex}
-                  className="text-xs font-bold whitespace-nowrap animate-in fade-in slide-in-from-bottom-2 duration-300"
-                  style={{ color: "var(--text-primary)" }}
+                <div className="flex items-center gap-1.5 text-cyan-400 shrink-0">
+                  <FaReact size={18} />
+                </div>
+                <div className="flex items-center gap-1.5 text-emerald-400 shrink-0">
+                  <FaNodeJs size={18} />
+                </div>
+                <div className="flex items-center gap-1.5 text-green-500 shrink-0">
+                  <SiMongodb size={18} />
+                </div>
+                <div
+                  className="pl-2.5 border-l overflow-hidden h-5 flex items-center shrink-0 min-w-[140px]"
+                  style={{ borderColor: "var(--glass-border)" }}
                 >
-                  {profile.roles[roleIndex]}
-                </span>
+                  <span
+                    key={roleIndex}
+                    className="text-xs font-bold whitespace-nowrap animate-in fade-in slide-in-from-bottom-2 duration-300"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    {profile.roles[roleIndex]}
+                  </span>
+                </div>
               </div>
             </div>
 
