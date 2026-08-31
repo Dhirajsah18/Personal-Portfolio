@@ -7,6 +7,7 @@ import Projects from "./components/Projects";
 import Education from "./components/Education";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
+import SectionDivider from "./components/SectionDivider";
 
 function App() {
   return (
@@ -15,10 +16,15 @@ function App() {
       <Navbar />
       <main>
         <Hero />
+        <SectionDivider />
         <Skills />
+        <SectionDivider />
         <Projects />
+        <SectionDivider />
         <Education />
+        <SectionDivider />
         <Contact />
+        <SectionDivider />
         <Footer />
       </main>
     </ThemeProvider>
