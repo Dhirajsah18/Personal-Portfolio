@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { FiSend, FiCheck, FiMail, FiGithub, FiLinkedin, FiMapPin, FiCopy, FiMessageSquare } from "react-icons/fi";
+import { FiSend, FiCheck, FiMail, FiGithub, FiLinkedin, FiMapPin, FiCopy, FiMessageSquare, FiAlertCircle } from "react-icons/fi";
 import { profile } from "../data";
 import { useReveal } from "../hooks/useReveal";
+import { api } from "../services/api";
 
 const Contact = () => {
   const ref = useReveal();
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [copied, setCopied] = useState(false);
 
   const handleChange = (e) =>
@@ -18,15 +21,29 @@ const Contact = () => {
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const subject = encodeURIComponent(`Portfolio Inquiry from ${form.name}`);
-    const body = encodeURIComponent(
-      `Hi Dhiraj,\n\n${form.message}\n\nFrom:\n${form.name}\n${form.email}`
-    );
-    window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
-    setSent(true);
-    setTimeout(() => setSent(false), 4000);
+    setSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      await api.sendMessage(form);
+      setSent(true);
+      setForm({ name: "", email: "", message: "" });
+      setTimeout(() => setSent(false), 5000);
+    } catch (err) {
+      console.warn("API submit error, opening fallback email client:", err);
+      // If server is offline, fallback gracefully to mailto
+      const subject = encodeURIComponent(`Portfolio Inquiry from ${form.name}`);
+      const body = encodeURIComponent(
+        `Hi Dhiraj,\n\n${form.message}\n\nFrom:\n${form.name}\n${form.email}`
+      );
+      window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
+      setSent(true);
+      setTimeout(() => setSent(false), 4000);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const githubHandle = profile.socials.github.split("/").filter(Boolean).pop();
@@ -248,11 +265,18 @@ const Contact = () => {
 
             <button
               type="submit"
-              className="btn-primary btn-shine w-full py-3.5 rounded-2xl font-bold text-sm inline-flex items-center justify-center gap-2"
+              disabled={submitting}
+              className="btn-primary btn-shine w-full py-3.5 rounded-2xl font-bold text-sm inline-flex items-center justify-center gap-2 transition-all shadow-lg"
             >
-              {sent ? (
+              {submitting ? (
                 <>
-                  <FiCheck size={16} /> Opening Email Client...
+                  <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                  <span>Saving & Sending Message...</span>
+                </>
+              ) : sent ? (
+                <>
+                  <FiCheck size={16} className="text-emerald-300" />
+                  <span>Message Saved & Sent Successfully!</span>
                 </>
               ) : (
                 <>

@@ -3,6 +3,7 @@ import { FiSun, FiMoon, FiMenu, FiX, FiFileText, FiDownload, FiArrowRight } from
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
 import { useTheme } from "../context/ThemeContext";
 import { navLinks, profile } from "../data";
+import { api } from "../services/api";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -90,6 +91,7 @@ const Navbar = () => {
             <a
               href={profile.resumeUrl}
               download
+              onClick={() => api.trackResumeDownload()}
               className="hidden sm:inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold border transition-all hover:scale-105"
               style={{
                 borderColor: "var(--glass-border)",
@@ -158,7 +160,10 @@ const Navbar = () => {
               <a
                 href={profile.resumeUrl}
                 download
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  api.trackResumeDownload();
+                  setIsOpen(false);
+                }}
                 className="btn-primary w-full py-2.5 rounded-xl text-center text-xs font-bold flex items-center justify-center gap-2"
               >
                 <FiDownload size={14} /> Download Resume

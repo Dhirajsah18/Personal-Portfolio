@@ -5,6 +5,7 @@ import { FiArrowDownRight, FiDownload, FiZap, FiCheckCircle } from "react-icons/
 import profileImg from "../assets/profile.jpg";
 import { profile } from "../data";
 import { useReveal } from "../hooks/useReveal";
+import { api } from "../services/api";
 
 const Hero = () => {
   const ref = useReveal();
@@ -72,6 +73,7 @@ const Hero = () => {
             <a
               href={profile.resumeUrl}
               download
+              onClick={() => api.trackResumeDownload()}
               className="glass pill-hover inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-semibold text-sm border"
               style={{
                 borderColor: "var(--glass-border)",

@@ -1,12 +1,28 @@
-import { useState } from "react";
-import { skills } from "../data";
+import { useState, useEffect } from "react";
+import { skills as staticSkills } from "../data";
 import { useReveal } from "../hooks/useReveal";
 import { getSkillIcon, getSkillColor } from "./skillIcons";
 import { FiCode, FiLayers } from "react-icons/fi";
+import { api } from "../services/api";
 
-const Skills = () => {
+const Skills = ({ refreshTrigger }) => {
   const ref = useReveal();
   const [activeTab, setActiveTab] = useState("all");
+  const [skillList, setSkillList] = useState(staticSkills);
+
+  useEffect(() => {
+    let isMounted = true;
+    api.getSkills()
+      .then((data) => {
+        if (isMounted && Array.isArray(data) && data.length > 0) {
+          setSkillList(data);
+        }
+      })
+      .catch((err) => {
+        console.log("Using static skills data fallback:", err.message);
+      });
+    return () => { isMounted = false; };
+  }, [refreshTrigger]);
 
   const filterOptions = [
     { id: "all", label: "All Skills" },
@@ -19,8 +35,8 @@ const Skills = () => {
 
   const filteredSkills =
     activeTab === "all"
-      ? skills
-      : skills.filter((group) => group.tag === activeTab);
+      ? skillList
+      : skillList.filter((group) => group.tag === activeTab);
 
   return (
     <section id="skills" className="section-tint tint-violet py-24 px-4">

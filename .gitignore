@@ -1,4 +1,24 @@
+# Dependencies
 node_modules/
+**/node_modules/
+
+# Production builds
 dist/
+**/dist/
+
+# Environment variables & secrets
 .env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Local fallback data & logs
+server/data/store.json
+*.log
+
+# IDE & OS
 .vscode/
+.DS_Store
+Thumbs.db

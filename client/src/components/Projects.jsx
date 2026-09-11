@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { FiExternalLink, FiGithub, FiX, FiFolder, FiCheckCircle, FiMaximize2 } from "react-icons/fi";
-import { projects } from "../data";
+import { projects as staticProjects } from "../data";
 import { useReveal } from "../hooks/useReveal";
+import { api } from "../services/api";
 import videoSummarizerImg from "../assets/video-summarizer.jpg";
 import creativeShowcaseImg from "../assets/creative-showcase.jpg";
 import vtubeImg from "/vtube.jpg";
@@ -13,10 +14,25 @@ const imageMap = {
   vtube: vtubeImg,
 };
 
-const Projects = () => {
+const Projects = ({ refreshTrigger }) => {
   const ref = useReveal();
   const [selected, setSelected] = useState(null);
   const [activeCategory, setActiveCategory] = useState("all");
+  const [projectList, setProjectList] = useState(staticProjects);
+
+  useEffect(() => {
+    let isMounted = true;
+    api.getProjects()
+      .then((data) => {
+        if (isMounted && Array.isArray(data) && data.length > 0) {
+          setProjectList(data);
+        }
+      })
+      .catch((err) => {
+        console.log("Using static projects data fallback:", err.message);
+      });
+    return () => { isMounted = false; };
+  }, [refreshTrigger]);
 
   useEffect(() => {
     if (selected) {
@@ -45,8 +61,8 @@ const Projects = () => {
 
   const filteredProjects =
     activeCategory === "all"
-      ? projects
-      : projects.filter((p) => p.category === activeCategory);
+      ? projectList
+      : projectList.filter((p) => p.category === activeCategory);
 
   return (
     <section id="projects" className="section-tint tint-cyan py-24 px-4">
@@ -93,7 +109,7 @@ const Projects = () => {
         {/* Projects Grid */}
         <div className="grid md:grid-cols-2 gap-7">
           {filteredProjects.map((project, i) => {
-            const img = project.image ? imageMap[project.image] : null;
+            const img = project.image ? (imageMap[project.image] || project.image) : null;
 
             return (
               <div
@@ -275,10 +291,10 @@ const Projects = () => {
                 <div className="grid lg:grid-cols-[1.1fr_1fr] gap-6 lg:gap-8 items-start">
                   {/* LEFT COLUMN: Visual Media & Action CTAs */}
                   <div className="space-y-4">
-                    {selected.image && imageMap[selected.image] ? (
+                    {selected.image ? (
                       <div className="relative rounded-2xl overflow-hidden h-52 sm:h-64 lg:h-[300px] border border-[var(--glass-border)] shrink-0 shadow-md">
                         <img
-                          src={imageMap[selected.image]}
+                          src={imageMap[selected.image] || selected.image}
                           alt={selected.title}
                           className="w-full h-full object-cover"
                         />

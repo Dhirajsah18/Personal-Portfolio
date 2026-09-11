@@ -1,7 +1,7 @@
-import { FiGithub, FiLinkedin, FiMail } from "react-icons/fi";
+import { FiGithub, FiLinkedin, FiMail, FiLock } from "react-icons/fi";
 import { profile, navLinks } from "../data";
 
-const Footer = () => {
+const Footer = ({ onOpenAdmin }) => {
   const socials = [
     { href: profile.socials.github, icon: <FiGithub size={16} />, label: "GitHub" },
     { href: profile.socials.linkedin, icon: <FiLinkedin size={16} />, label: "LinkedIn" },
@@ -78,12 +78,20 @@ const Footer = () => {
 
         {/* Bottom bar */}
         <div
-          className="pt-6 border-t text-center sm:text-left"
+          className="pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-4"
           style={{ borderColor: "var(--glass-border)" }}
         >
           <p className="text-xs" style={{ color: "var(--text-muted)" }}>
             © {new Date().getFullYear()} {profile.name}. All rights reserved.
           </p>
+
+          <button
+            onClick={onOpenAdmin}
+            className="text-xs text-[var(--text-muted)] hover:text-[var(--accent)] flex items-center gap-1.5 transition-colors glass px-3 py-1.5 rounded-xl border border-[var(--glass-border)]"
+          >
+            <FiLock size={12} />
+            <span>Admin Portal</span>
+          </button>
         </div>
       </div>
     </footer>
