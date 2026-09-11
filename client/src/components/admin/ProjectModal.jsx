@@ -5,7 +5,6 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
   const [formData, setFormData] = useState({
     title: "",
     category: "fullstack",
-    badge: "",
     description: "",
     highlights: "",
     tech: "",
@@ -21,7 +20,6 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
       setFormData({
         title: project.title || "",
         category: project.category || "fullstack",
-        badge: project.badge || "",
         description: project.description || "",
         highlights: Array.isArray(project.highlights)
           ? project.highlights.join(", ")
@@ -37,7 +35,6 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
       setFormData({
         title: "",
         category: "fullstack",
-        badge: "",
         description: "",
         highlights: "",
         tech: "",
@@ -59,6 +56,7 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
     try {
       const payload = {
         ...formData,
+        badge: "", // No tagline as requested
         highlights: formData.highlights
           .split(",")
           .map((s) => s.trim())
@@ -79,26 +77,46 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
       <div
-        className="glass w-full max-w-2xl rounded-3xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto relative border"
-        style={{ borderColor: "var(--glass-border)", background: "var(--bg-card, #121826)" }}
+        className="glass modal-glow w-full max-w-2xl rounded-3xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto relative border shadow-2xl"
+        style={{ borderColor: "var(--glass-border)", background: "var(--modal-bg)" }}
       >
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full glass hover:scale-110 transition-transform"
-          aria-label="Close"
+        {/* Modal Header with Icon, Title and properly positioned Cross Button */}
+        <div
+          className="flex items-center justify-between pb-5 mb-5 border-b"
+          style={{ borderColor: "var(--glass-border)" }}
         >
-          <FiX size={20} />
-        </button>
+          <div className="flex items-center gap-3">
+            <div
+              className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-md shrink-0"
+              style={{ background: "var(--accent-gradient)" }}
+            >
+              <FiLayers size={18} />
+            </div>
+            <div>
+              <h3 className="text-lg sm:text-xl font-bold font-display" style={{ color: "var(--text-primary)" }}>
+                {project ? "Edit Project Details" : "Create New Project"}
+              </h3>
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                Manage project information, category, links & stack
+              </p>
+            </div>
+          </div>
 
-        <h3 className="text-xl font-bold font-display flex items-center gap-2 mb-6" style={{ color: "var(--text-primary)" }}>
-          <FiLayers style={{ color: "var(--accent)" }} />
-          {project ? "Edit Project" : "Add New Project"}
-        </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-9 h-9 rounded-full glass border flex items-center justify-center hover:scale-110 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:rotate-90 transition-all cursor-pointer shadow-sm shrink-0"
+            style={{ borderColor: "var(--glass-border)", color: "var(--text-muted)" }}
+            aria-label="Close"
+          >
+            <FiX size={18} />
+          </button>
+        </div>
 
         {error && (
-          <div className="mb-4 p-3 rounded-xl bg-red-500/20 border border-red-500/30 text-red-300 text-xs font-semibold">
+          <div className="mb-4 p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-semibold">
             {error}
           </div>
         )}
@@ -106,7 +124,7 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider mb-1 text-[var(--text-secondary)]">
+              <label className="block text-xs font-mono uppercase tracking-wider mb-1.5 text-[var(--text-secondary)] font-semibold">
                 Title *
               </label>
               <input
@@ -121,54 +139,38 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
             </div>
 
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider mb-1 text-[var(--text-secondary)]">
+              <label className="block text-xs font-mono uppercase tracking-wider mb-1.5 text-[var(--text-secondary)] font-semibold">
                 Category *
               </label>
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 className="w-full border rounded-xl px-3.5 py-2.5 text-sm glass focus:ring-2 focus:ring-[var(--accent)] outline-none"
-                style={{ borderColor: "var(--glass-border)", color: "var(--text-primary)", background: "transparent" }}
+                style={{ borderColor: "var(--glass-border)", color: "var(--text-primary)", background: "var(--glass-bg)" }}
               >
-                <option value="fullstack" className="text-black">Full-Stack MERN</option>
-                <option value="ai" className="text-black">AI & Tools</option>
-                <option value="backend" className="text-black">Backend & APIs</option>
-                <option value="frontend" className="text-black">Frontend UI</option>
-                <option value="other" className="text-black">Other</option>
+                <option value="fullstack" className="bg-[#0e1422] text-slate-200">Full-Stack MERN</option>
+                <option value="ai" className="bg-[#0e1422] text-slate-200">AI & Tools</option>
+                <option value="backend" className="bg-[#0e1422] text-slate-200">Backend & APIs</option>
+                <option value="frontend" className="bg-[#0e1422] text-slate-200">Frontend UI</option>
+                <option value="other" className="bg-[#0e1422] text-slate-200">Other</option>
               </select>
             </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-mono uppercase tracking-wider mb-1 text-[var(--text-secondary)]">
-                Badge / Tagline
-              </label>
+          <div className="flex items-center gap-2 pt-1 pb-1">
+            <label className="flex items-center gap-2.5 text-sm font-semibold cursor-pointer select-none" style={{ color: "var(--text-primary)" }}>
               <input
-                type="text"
-                value={formData.badge}
-                onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
-                placeholder="e.g. Full-Stack MERN"
-                className="w-full border rounded-xl px-3.5 py-2.5 text-sm glass focus:ring-2 focus:ring-[var(--accent)] outline-none"
-                style={{ borderColor: "var(--glass-border)", color: "var(--text-primary)" }}
+                type="checkbox"
+                checked={formData.featured}
+                onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                className="w-4 h-4 rounded accent-orange-500 cursor-pointer"
               />
-            </div>
-
-            <div className="flex items-center gap-3 pt-6">
-              <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer" style={{ color: "var(--text-primary)" }}>
-                <input
-                  type="checkbox"
-                  checked={formData.featured}
-                  onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                  className="w-4 h-4 rounded text-[var(--accent)]"
-                />
-                Featured on Hero/Top
-              </label>
-            </div>
+              <span>Mark as Featured Project (Display prominently on portfolio)</span>
+            </label>
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider mb-1 text-[var(--text-secondary)]">
+            <label className="block text-xs font-mono uppercase tracking-wider mb-1.5 text-[var(--text-secondary)] font-semibold">
               Description *
             </label>
             <textarea
@@ -176,14 +178,14 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
               required
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Detailed description of features, problem solved, architecture..."
+              placeholder="Concise overview of features, problem solved, architecture..."
               className="w-full border rounded-xl px-3.5 py-2.5 text-sm glass focus:ring-2 focus:ring-[var(--accent)] outline-none resize-none"
               style={{ borderColor: "var(--glass-border)", color: "var(--text-primary)" }}
             />
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider mb-1 text-[var(--text-secondary)]">
+            <label className="block text-xs font-mono uppercase tracking-wider mb-1.5 text-[var(--text-secondary)] font-semibold">
               Highlights (comma separated)
             </label>
             <input
@@ -197,7 +199,7 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider mb-1 text-[var(--text-secondary)]">
+            <label className="block text-xs font-mono uppercase tracking-wider mb-1.5 text-[var(--text-secondary)] font-semibold">
               Tech Stack (comma separated) *
             </label>
             <input
@@ -205,7 +207,7 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
               required
               value={formData.tech}
               onChange={(e) => setFormData({ ...formData, tech: e.target.value })}
-              placeholder="React, Node.js, Express, MongoDB, Tailwind"
+              placeholder="React, Node.js, Express, MongoDB, Tailwind CSS"
               className="w-full border rounded-xl px-3.5 py-2.5 text-sm glass focus:ring-2 focus:ring-[var(--accent)] outline-none"
               style={{ borderColor: "var(--glass-border)", color: "var(--text-primary)" }}
             />
@@ -213,8 +215,8 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider mb-1 text-[var(--text-secondary)]">
-                GitHub URL
+              <label className="block text-xs font-mono uppercase tracking-wider mb-1.5 text-[var(--text-secondary)] font-semibold">
+                GitHub Repository URL
               </label>
               <input
                 type="url"
@@ -227,8 +229,8 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
             </div>
 
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider mb-1 text-[var(--text-secondary)]">
-                Live Demo Link
+              <label className="block text-xs font-mono uppercase tracking-wider mb-1.5 text-[var(--text-secondary)] font-semibold">
+                Live Deployment URL
               </label>
               <input
                 type="url"
@@ -241,22 +243,22 @@ const ProjectModal = ({ isOpen, onClose, onSave, project }) => {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: "var(--glass-border)" }}>
+          <div className="flex justify-end gap-3 pt-5 border-t" style={{ borderColor: "var(--glass-border)" }}>
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl text-sm font-semibold glass hover:border-[var(--accent)]"
-              style={{ color: "var(--text-secondary)" }}
+              className="glass pill-hover px-5 py-2.5 rounded-2xl text-xs font-semibold border"
+              style={{ borderColor: "var(--glass-border)", color: "var(--text-secondary)" }}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary px-6 py-2.5 rounded-xl text-sm font-bold inline-flex items-center gap-2"
+              className="btn-primary btn-shine px-6 py-2.5 rounded-2xl text-xs font-bold inline-flex items-center gap-2 shadow-md"
             >
               <FiCheck size={16} />
-              {loading ? "Saving..." : project ? "Update Project" : "Create Project"}
+              <span>{loading ? "Saving Changes..." : project ? "Save Updates" : "Create Project"}</span>
             </button>
           </div>
         </form>

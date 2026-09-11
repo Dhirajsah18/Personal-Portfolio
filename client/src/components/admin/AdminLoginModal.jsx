@@ -35,40 +35,45 @@ const AdminLoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
       <div
-        className="glass w-full max-w-md rounded-3xl p-7 sm:p-9 relative border shadow-2xl"
-        style={{ borderColor: "var(--glass-border)", background: "var(--bg-card, #0f172a)" }}
+        className="glass modal-glow w-full max-w-md rounded-3xl p-7 sm:p-9 relative border shadow-2xl"
+        style={{ borderColor: "var(--glass-border)", background: "var(--modal-bg)" }}
       >
         <button
+          type="button"
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full glass hover:scale-110 transition-transform"
+          className="w-9 h-9 rounded-full glass border flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--accent)] hover:rotate-90 transition-all cursor-pointer shadow-sm z-10"
+          style={{ borderColor: "var(--glass-border)", position: "absolute", top: "1.25rem", right: "1.25rem" }}
           aria-label="Close"
         >
           <FiX size={18} />
         </button>
 
         <div className="flex flex-col items-center text-center mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-[var(--accent)] text-white grid place-items-center mb-3 shadow-lg">
+          <div
+            className="w-14 h-14 rounded-2xl text-white grid place-items-center mb-3 shadow-lg"
+            style={{ background: "var(--accent-gradient)" }}
+          >
             <FiLock size={24} />
           </div>
-          <h2 className="text-2xl font-bold font-display" style={{ color: "var(--text-primary)" }}>
+          <h2 className="text-2xl font-bold font-display heading-accent" style={{ color: "var(--text-primary)" }}>
             Admin Portal
           </h2>
-          <p className="text-xs text-[var(--text-muted)] mt-1">
-            Sign in with JWT credentials to manage portfolio, messages & analytics.
+          <p className="text-xs text-[var(--text-muted)] mt-2">
+            Sign in with JWT credentials to manage portfolio projects, skills & analytics.
           </p>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 rounded-xl bg-red-500/20 border border-red-500/30 text-red-300 text-xs font-semibold text-center">
+          <div className="mb-4 p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-semibold text-center">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider mb-1.5 text-[var(--text-secondary)]">
+            <label className="block text-xs font-mono uppercase tracking-wider mb-1.5 text-[var(--text-secondary)] font-semibold">
               Admin Email
             </label>
             <div className="relative">
@@ -88,7 +93,7 @@ const AdminLoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider mb-1.5 text-[var(--text-secondary)]">
+            <label className="block text-xs font-mono uppercase tracking-wider mb-1.5 text-[var(--text-secondary)] font-semibold">
               Password
             </label>
             <div className="relative">
@@ -119,7 +124,7 @@ const AdminLoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
             <button
               type="button"
               onClick={handleQuickFill}
-              className="text-xs text-[var(--accent)] hover:underline font-medium"
+              className="text-xs text-[var(--accent)] hover:underline font-semibold"
             >
               Fill Default Demo
             </button>
@@ -128,7 +133,7 @@ const AdminLoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary w-full py-3 rounded-xl font-bold text-sm inline-flex items-center justify-center gap-2 mt-2 shadow-lg"
+            className="btn-primary btn-shine w-full py-3.5 rounded-2xl font-bold text-sm inline-flex items-center justify-center gap-2 mt-2 shadow-lg"
           >
             {loading ? "Authenticating..." : (
               <>

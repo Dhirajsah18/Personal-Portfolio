@@ -3,7 +3,7 @@ import { HiSparkles } from "react-icons/hi2";
 const SectionDivider = () => {
   return (
     <div
-      className="relative max-w-5xl mx-auto px-6 py-6 flex items-center justify-center pointer-events-none select-none"
+      className="relative max-w-4xl mx-auto px-6 py-1 flex items-center justify-center pointer-events-none select-none opacity-60"
       aria-hidden="true"
     >
       {/* Left Beam with Micro Node */}

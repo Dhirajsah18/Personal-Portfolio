@@ -50,9 +50,8 @@ const initialProjects = [
     title: "V-Tube — Video Sharing Platform",
     category: "fullstack",
     featured: true,
-    badge: "Full-Stack MERN",
     description:
-      "A scalable video streaming & sharing platform with JWT-authenticated backend. Engineered 10+ REST API endpoints handling video uploads, likes, dynamic comment threads, user playlists, and real-time subscriptions.",
+      "Full-stack video platform featuring JWT authentication, media uploads, custom playlists, comments, and real-time subscriptions.",
     highlights: ["10+ Secure Endpoints", "JWT Authentication", "Video Streaming Architecture"],
     tech: ["React.js", "Node.js", "Express.js", "MongoDB", "JWT Auth", "REST APIs", "Tailwind CSS"],
     image: "vtube",
@@ -64,9 +63,8 @@ const initialProjects = [
     title: "Creative Showcase — Image Gallery",
     category: "fullstack",
     featured: true,
-    badge: "Interactive Media",
     description:
-      "A responsive image portfolio platform enabling user-specific media uploads, tag-based discovery, and personalized creator dashboards with a masonry layout and access-controlled backend APIs.",
+      "Creator image portfolio featuring cloud media uploads, tag-based discovery, and a responsive masonry layout.",
     highlights: ["Masonry Grid Layout", "Cloud Media Uploads", "User Dashboard"],
     tech: ["React.js", "Node.js", "Express.js", "MongoDB", "JWT Auth", "Tailwind CSS"],
     image: "creative-showcase",
@@ -78,9 +76,8 @@ const initialProjects = [
     title: "Smart Video Summarizer",
     category: "ai",
     featured: true,
-    badge: "AI & Transcription",
     description:
-      "An intelligent AI-powered application that transcribes video audio into structured, concise text summaries. Cuts hour-long videos into quick 2-minute actionable takeaways with high transcription accuracy.",
+      "AI web app transcribing video audio into concise, actionable text summaries in minutes.",
     highlights: ["Audio-to-Text Pipeline", "AI Summarization", "FastAPI Integration"],
     tech: ["React", "Vite", "Tailwind CSS", "Node.js", "FastAPI", "REST APIs"],
     image: "video-summarizer",
@@ -92,9 +89,8 @@ const initialProjects = [
     title: "Smart Task Management REST API",
     category: "backend",
     featured: false,
-    badge: "Backend & Auth",
     description:
-      "A high-performance task management backend built with Node.js and Express. Features 8+ secure endpoints, centralized validation middlewares, and custom error handling pipelines with MongoDB.",
+      "REST API backend with secure JWT authentication, CRUD workflows, and structured MongoDB data models.",
     highlights: ["8+ Secured Endpoints", "Centralized Validation", "JWT Authorization"],
     tech: ["Node.js", "Express.js", "MongoDB", "JWT Auth", "Postman"],
     image: "",

@@ -8,11 +8,11 @@ export const getProjects = async (req, res) => {
     const { isMongoConnected } = getDbStatus();
 
     if (isMongoConnected) {
-      const projects = await Project.find().sort({ createdAt: -1 });
+      const projects = await Project.find().sort({ order: 1, createdAt: -1 });
       return res.status(200).json({ success: true, count: projects.length, data: projects });
     } else {
       const store = readStore();
-      const projects = (store.projects || []).slice().reverse();
+      const projects = (store.projects || []).slice().sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
       return res.status(200).json({ success: true, count: projects.length, data: projects });
     }
   } catch (error) {
@@ -244,5 +244,37 @@ export const deleteProject = async (req, res) => {
   } catch (error) {
     console.error("Delete project error:", error);
     return res.status(500).json({ success: false, message: "Error deleting project" });
+  }
+};
+
+// PUT /api/projects/reorder (Admin)
+export const reorderProjects = async (req, res) => {
+  try {
+    const { projectIds } = req.body;
+    if (!Array.isArray(projectIds) || projectIds.length === 0) {
+      return res.status(400).json({ success: false, message: "projectIds array is required" });
+    }
+
+    const { isMongoConnected } = getDbStatus();
+
+    if (isMongoConnected) {
+      const updates = projectIds.map((id, index) =>
+        Project.findByIdAndUpdate(id, { order: index })
+      );
+      await Promise.all(updates);
+      return res.status(200).json({ success: true, message: "Projects reordered successfully" });
+    } else {
+      const store = readStore();
+      store.projects = (store.projects || []).map((p) => {
+        const id = p._id || p.slug;
+        const newOrder = projectIds.indexOf(id);
+        return newOrder !== -1 ? { ...p, order: newOrder } : p;
+      });
+      writeStore(store);
+      return res.status(200).json({ success: true, message: "Projects reordered successfully" });
+    }
+  } catch (error) {
+    console.error("Reorder projects error:", error);
+    return res.status(500).json({ success: false, message: "Error reordering projects" });
   }
 };

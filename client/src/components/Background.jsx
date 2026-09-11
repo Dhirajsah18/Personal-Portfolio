@@ -23,14 +23,20 @@ const Background = () => {
       }
     };
 
-    // Scroll progress bar tracker
+    // Scroll progress bar tracker with requestAnimationFrame throttle
+    let scrollRafId = null;
     const handleScroll = () => {
-      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
-      const bar = document.getElementById("scroll-progress");
-      if (bar) {
-        bar.style.width = `${scrolled}%`;
+      if (!scrollRafId) {
+        scrollRafId = requestAnimationFrame(() => {
+          const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+          const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+          const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+          const bar = document.getElementById("scroll-progress");
+          if (bar) {
+            bar.style.width = `${scrolled}%`;
+          }
+          scrollRafId = null;
+        });
       }
     };
 
@@ -45,6 +51,7 @@ const Background = () => {
       }
       window.removeEventListener("scroll", handleScroll);
       if (rafId) cancelAnimationFrame(rafId);
+      if (scrollRafId) cancelAnimationFrame(scrollRafId);
     };
   }, []);
 

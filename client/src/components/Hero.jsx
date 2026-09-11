@@ -22,7 +22,7 @@ const Hero = () => {
     <section
       id="about"
       ref={ref}
-      className="section-tint min-h-screen flex items-center pt-32 pb-20 px-4"
+      className="section-tint flex items-center pt-28 pb-12 sm:pt-36 sm:pb-16 px-4"
     >
       <div className="max-w-6xl mx-auto w-full glass p-7 md:p-14 grid lg:grid-cols-[1.2fr_0.8fr] gap-12 items-center">
         {/* LEFT COLUMN */}
@@ -160,38 +160,10 @@ const Hero = () => {
               </div>
             </div>
 
-            {/* Floating Live Code Terminal Card (At Bottom Left) */}
-            <div
-              className="glass animate-float-slow hidden sm:block absolute -bottom-6 -left-8 md:-left-12 w-52 p-4 font-mono text-[11px] leading-relaxed shadow-2xl z-10"
-              style={{ animationDelay: "1s" }}
-            >
-              <div className="flex gap-1.5 mb-2.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
-              </div>
-              <p style={{ color: "var(--text-secondary)" }}>
-                <span style={{ color: "var(--accent-violet)" }}>const</span> engineer = {"{"}
-              </p>
-              <p className="pl-3" style={{ color: "var(--text-secondary)" }}>
-                stack: <span style={{ color: "var(--accent)" }}>'MERN'</span>,
-              </p>
-              <p className="pl-3" style={{ color: "var(--text-secondary)" }}>
-                apis: <span style={{ color: "var(--accent)" }}>'RESTful'</span>,
-              </p>
-              <p className="pl-3" style={{ color: "var(--text-secondary)" }}>
-                status: <span style={{ color: "var(--accent-emerald)" }}>'Building'</span>
-              </p>
-              <p style={{ color: "var(--text-secondary)" }}>
-                {"}"}
-                <span className="blink-cursor" style={{ color: "var(--accent)" }}>▍</span>
-              </p>
-            </div>
-
             {/* Mini Achievement Badge (Right Side Vertically Centered) */}
             <div
-              className="glass animate-float-slow hidden md:flex absolute top-1/2 -translate-y-1/2 -right-8 md:-right-14 items-center gap-2 px-3.5 py-2 shadow-lg z-10"
-              style={{ animationDelay: "2s" }}
+              className="glass animate-float-slow hidden md:flex absolute -bottom-2 right-2 items-center gap-2 px-3.5 py-2 shadow-lg z-10"
+              style={{ animationDelay: "1.5s" }}
             >
               <FiCheckCircle size={16} className="text-emerald-400" />
               <span className="text-[11px] font-semibold whitespace-nowrap" style={{ color: "var(--text-primary)" }}>

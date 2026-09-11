@@ -16,6 +16,6 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: ADMIN_EMAIL
-        value: dhirajsah2003@gmail.com
+        value: [EMAIL_ADDRESS]
       - key: ADMIN_PASSWORD
         sync: false

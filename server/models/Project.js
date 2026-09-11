@@ -18,6 +18,7 @@ const projectSchema = new mongoose.Schema(
     image: { type: String, default: "" },
     github: { type: String, default: "" },
     link: { type: String, default: "" },
+    order: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

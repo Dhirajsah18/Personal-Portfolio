@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { ThemeProvider } from "./context/ThemeContext";
 import Background from "./components/Background";
 import Navbar from "./components/Navbar";
@@ -9,10 +9,12 @@ import Education from "./components/Education";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import SectionDivider from "./components/SectionDivider";
-import { lazy, Suspense } from "react";
+import { api } from "./services/api";
+
 const AdminLoginModal = lazy(() => import("./components/admin/AdminLoginModal"));
 const AdminDashboard = lazy(() => import("./components/admin/AdminDashboard"));
-import { api } from "./services/api";
+
+const ADMIN_PATH = import.meta.env.VITE_ADMIN_PATH || "/admin-login";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("portfolio_admin_token") || null);
@@ -20,37 +22,78 @@ function App() {
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Track visitor analytics once per session
+  // Track visitor analytics once per session (ignore secret admin visits from analytics)
   useEffect(() => {
-    const hasVisited = sessionStorage.getItem("portfolio_visited");
-    if (!hasVisited) {
-      api.trackVisit(window.location.pathname, document.referrer);
-      sessionStorage.setItem("portfolio_visited", "true");
+    const isSecretAdminRoute =
+      window.location.pathname.toLowerCase() === ADMIN_PATH.toLowerCase();
+
+    if (!isSecretAdminRoute) {
+      const hasVisited = sessionStorage.getItem("portfolio_visited");
+      if (!hasVisited) {
+        api.trackVisit(window.location.pathname, document.referrer);
+        sessionStorage.setItem("portfolio_visited", "true");
+      }
     }
   }, []);
 
-  // Keyboard shortcut Ctrl + Shift + A for Admin Portal
+  // Listen to secret Admin URL (e.g. /admin-login or #admin-login)
+  useEffect(() => {
+    const checkAdminRoute = () => {
+      const currentPath = window.location.pathname.toLowerCase();
+      const currentHash = window.location.hash.toLowerCase();
+      const targetPath = ADMIN_PATH.toLowerCase();
+      const targetHash = `#${targetPath.replace(/^\//, "")}`;
+
+      if (currentPath === targetPath || currentHash === targetHash) {
+        if (token) {
+          setIsDashboardOpen(true);
+        } else {
+          setIsLoginOpen(true);
+        }
+      }
+    };
+
+    checkAdminRoute();
+    window.addEventListener("popstate", checkAdminRoute);
+    window.addEventListener("hashchange", checkAdminRoute);
+    return () => {
+      window.removeEventListener("popstate", checkAdminRoute);
+      window.removeEventListener("hashchange", checkAdminRoute);
+    };
+  }, [token]);
+
+  // Secret hotkey shortcut: Ctrl + Shift + A
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
         e.preventDefault();
-        handleOpenAdmin();
+        if (token) {
+          setIsDashboardOpen(true);
+        } else {
+          setIsLoginOpen(true);
+        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [token]);
 
-  const handleOpenAdmin = () => {
-    if (token) {
-      setIsDashboardOpen(true);
-    } else {
-      setIsLoginOpen(true);
+  const handleCloseAdmin = () => {
+    setIsLoginOpen(false);
+    setIsDashboardOpen(false);
+    const currentPath = window.location.pathname.toLowerCase();
+    const currentHash = window.location.hash.toLowerCase();
+    const targetPath = ADMIN_PATH.toLowerCase();
+    const targetHash = `#${targetPath.replace(/^\//, "")}`;
+
+    if (currentPath === targetPath || currentHash === targetHash) {
+      window.history.pushState(null, "", "/");
     }
   };
 
   const handleLoginSuccess = (newToken) => {
     setToken(newToken);
+    setIsLoginOpen(false);
     setIsDashboardOpen(true);
   };
 
@@ -58,7 +101,7 @@ function App() {
     localStorage.removeItem("portfolio_admin_token");
     localStorage.removeItem("portfolio_admin_user");
     setToken(null);
-    setIsDashboardOpen(false);
+    handleCloseAdmin();
   };
 
   const handleDataUpdated = () => {
@@ -80,15 +123,15 @@ function App() {
         <SectionDivider />
         <Contact />
         <SectionDivider />
-        <Footer onOpenAdmin={handleOpenAdmin} />
+        <Footer />
       </main>
 
-      {/* Admin Modals with Suspense */}
+      {/* Secret Admin Modals with Suspense */}
       <Suspense fallback={null}>
         {isLoginOpen && (
           <AdminLoginModal
             isOpen={isLoginOpen}
-            onClose={() => setIsLoginOpen(false)}
+            onClose={handleCloseAdmin}
             onLoginSuccess={handleLoginSuccess}
           />
         )}
@@ -96,7 +139,7 @@ function App() {
         {isDashboardOpen && (
           <AdminDashboard
             isOpen={isDashboardOpen}
-            onClose={() => setIsDashboardOpen(false)}
+            onClose={handleCloseAdmin}
             onLogout={handleLogout}
             onDataUpdated={handleDataUpdated}
           />

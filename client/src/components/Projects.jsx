@@ -65,12 +65,12 @@ const Projects = ({ refreshTrigger }) => {
       : projectList.filter((p) => p.category === activeCategory);
 
   return (
-    <section id="projects" className="section-tint tint-cyan py-24 px-4">
+    <section id="projects" className="section-tint tint-cyan py-16 sm:py-20 px-4">
       <div ref={ref} className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="reveal mb-12 flex flex-col items-center justify-center text-center space-y-3">
+        <div className="reveal mb-8 flex flex-col items-center justify-center text-center space-y-2.5">
           <div
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-mono tracking-widest uppercase font-semibold"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border text-xs font-mono tracking-widest uppercase font-semibold"
             style={{
               borderColor: "var(--glass-border)",
               color: "var(--accent)",
@@ -90,12 +90,12 @@ const Projects = ({ refreshTrigger }) => {
         </div>
 
         {/* Filter Pills */}
-        <div className="reveal flex flex-wrap justify-center gap-2 mb-10">
+        <div className="reveal flex flex-wrap justify-center gap-2 mb-8">
           {filterTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveCategory(tab.id)}
-              className={`px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 border ${
+              className={`px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 border ${
                 activeCategory === tab.id
                   ? "bg-[var(--accent)] text-white border-transparent shadow-md scale-105"
                   : "glass border-[var(--glass-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent)]"
@@ -107,7 +107,7 @@ const Projects = ({ refreshTrigger }) => {
         </div>
 
         {/* Projects Grid */}
-        <div className="grid md:grid-cols-2 gap-7">
+        <div className="grid md:grid-cols-2 gap-6">
           {filteredProjects.map((project, i) => {
             const img = project.image ? (imageMap[project.image] || project.image) : null;
 
@@ -122,7 +122,7 @@ const Projects = ({ refreshTrigger }) => {
                   {img ? (
                     <div
                       onClick={() => setSelected(project)}
-                      className="relative rounded-2xl overflow-hidden mb-5 h-48 cursor-pointer bg-slate-900 border border-[var(--glass-border)]"
+                      className="relative rounded-2xl overflow-hidden mb-4 h-48 cursor-pointer bg-slate-900 border border-[var(--glass-border)]"
                     >
                       <img
                         src={img}
@@ -133,11 +133,6 @@ const Projects = ({ refreshTrigger }) => {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
 
-                      {/* Floating Badge */}
-                      <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-[11px] font-bold text-white bg-black/60 backdrop-blur-md border border-white/10">
-                        {project.badge}
-                      </span>
-
                       {/* Quick view overlay icon */}
                       <div className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100">
                         <FiMaximize2 size={16} />
@@ -146,13 +141,13 @@ const Projects = ({ refreshTrigger }) => {
                   ) : (
                     <div
                       onClick={() => setSelected(project)}
-                      className="relative rounded-2xl p-6 mb-5 h-36 flex flex-col justify-between cursor-pointer border border-[var(--glass-border)] bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-highlight)]"
+                      className="relative rounded-2xl p-5 mb-4 h-36 flex flex-col justify-between cursor-pointer border border-[var(--glass-border)] bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-highlight)]"
                     >
                       <span className="px-3 py-1 rounded-full text-[11px] font-bold text-[var(--accent)] border border-[var(--accent)]/30 w-fit">
-                        {project.badge}
+                        REST API Architecture
                       </span>
                       <p className="font-mono text-xs text-[var(--text-muted)] flex items-center gap-2">
-                        <span>REST API Backend Architecture</span>
+                        <span>Backend Architecture & Endpoints</span>
                         <FiMaximize2 size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
                       </p>
                     </div>
@@ -161,14 +156,14 @@ const Projects = ({ refreshTrigger }) => {
                   {/* Title & Description */}
                   <h3
                     onClick={() => setSelected(project)}
-                    className="font-display text-xl sm:text-2xl font-bold mb-2.5 cursor-pointer hover:text-[var(--accent)] transition-colors"
+                    className="font-display text-xl sm:text-2xl font-bold mb-2 cursor-pointer hover:text-[var(--accent)] transition-colors"
                     style={{ color: "var(--text-primary)" }}
                   >
                     {project.title}
                   </h3>
 
                   <p
-                    className="text-sm line-clamp-3 mb-5 leading-relaxed"
+                    className="text-xs sm:text-sm line-clamp-2 mb-4 leading-relaxed"
                     style={{ color: "var(--text-secondary)" }}
                   >
                     {project.description}
@@ -178,11 +173,11 @@ const Projects = ({ refreshTrigger }) => {
                 {/* Card Footer: Bordered Tech Stack Chips with Hover & Action Links */}
                 <div>
                   {/* Tech stack pills with border and interactive hover */}
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {project.tech.map((t) => (
+                  <div className="flex flex-wrap gap-1.5 mb-5">
+                    {project.tech.slice(0, 5).map((t) => (
                       <span
                         key={t}
-                        className="pill-hover text-xs font-semibold px-3 py-1.5 rounded-xl border transition-all duration-200 cursor-default"
+                        className="pill-hover text-xs font-semibold px-2.5 py-1 rounded-xl border transition-all duration-200 cursor-default"
                         style={{
                           borderColor: "var(--glass-border)",
                           background: "var(--glass-bg)",
@@ -270,10 +265,10 @@ const Projects = ({ refreshTrigger }) => {
               >
                 <div className="flex items-center gap-2.5">
                   <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent)] font-mono px-3 py-1 rounded-full bg-[var(--accent)]/10 border border-[var(--accent)]/20">
-                    {selected.badge || "Case Study"}
+                    {selected.category || "Project"}
                   </span>
                   <span className="hidden sm:inline text-xs text-[var(--text-muted)] font-mono">
-                    • Project Architecture & Specs
+                    • Architecture & Overview
                   </span>
                 </div>
                 <button

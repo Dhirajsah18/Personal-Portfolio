@@ -71,6 +71,17 @@ export const api = {
     return data;
   },
 
+  async reorderProjects(projectIds) {
+    const res = await fetch(`${API_BASE}/projects/reorder`, {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ projectIds }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed to reorder projects");
+    return data;
+  },
+
   // Skills
   async getSkills() {
     const res = await fetch(`${API_BASE}/skills`);

@@ -76,12 +76,12 @@ const Contact = () => {
   ];
 
   return (
-    <section id="contact" className="section-tint tint-cyan py-24 px-4">
+    <section id="contact" className="section-tint tint-cyan py-16 sm:py-20 px-4">
       <div ref={ref} className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="reveal mb-16 flex flex-col items-center justify-center text-center space-y-3">
+        <div className="reveal mb-10 flex flex-col items-center justify-center text-center space-y-2.5">
           <div
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-mono tracking-widest uppercase font-semibold"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border text-xs font-mono tracking-widest uppercase font-semibold"
             style={{
               borderColor: "var(--glass-border)",
               color: "var(--accent)",
