@@ -1,52 +1,94 @@
-## Dhiraj Kumar Sah — Portfolio
+# Dhiraj Kumar Sah — Portfolio & Admin CMS
 
-A personal portfolio built with Vite, React, and Tailwind CSS. This repo powers a single-page portfolio site where content is driven from `src/data.js` so you can update projects, skills, and personal details without touching the React components.
+A modern, full-stack personal portfolio and content management system built with the MERN stack. Features a responsive, glassmorphic UI and a protected administrative dashboard for managing projects, skills, and resume assets in real time.
 
 ---
 
-## Quick Start
+## Tech Stack
 
-Prerequisites: Node.js (16+ recommended) and npm or yarn.
+- **Frontend:** React, Vite, Tailwind CSS, Lucide React
+- **Backend:** Node.js, Express.js, JWT Authentication
+- **Database:** MongoDB Atlas, Mongoose
+- **Deployment:** Vercel (Frontend), Render (Backend)
 
-```bash
-npm install
-npm run dev      
-npm run build    
-npm run preview  
-```
 ---
 
 ## Features
 
-- Minimal, responsive portfolio layout
-- Sections: Hero, Skills, Projects, Education, Contact, Footer
-- Content kept in a single file (`src/data.js`) for easy editing
-- Built with Vite + React + Tailwind CSS for fast development
+- **Modern Interface:** Glassmorphic dark-theme UI with responsive layouts and smooth micro-interactions.
+- **Admin Dashboard:** Secure JWT authentication to create, update, and manage projects and skills dynamically.
+- **Dynamic Resume Management:** Upload, preview, and serve resumes with integrated download analytics.
+- **Optimized Performance:** WebP asset delivery, HTTP compression, and optimized API payloads.
+- **Visitor Analytics:** Lightweight tracking for site visits and resume downloads.
 
 ---
 
 ## Project Structure
 
-- `src/` — React source files and components
-- `src/data.js` — Central place for name, bio, projects, skills, links
-- `public/` — static assets (icons, resume PDF, manifest)
-- `index.html` — Vite entry
+```
+├── client/     # Frontend application (React + Vite + Tailwind CSS)
+└── server/     # Backend REST API (Node.js + Express + MongoDB)
+```
 
 ---
 
-## Editing Content
+## Getting Started
 
-All site text and project data live in `src/data.js`. Update that file to change:
+### Prerequisites
+- Node.js (v18+)
+- npm or yarn
+- MongoDB connection string (Local or MongoDB Atlas)
 
-- Your name, role, and bio
-- Project list (title, description, links, images)
-- Skills and education entries
-- Social links and contact info
+### 1. Installation
 
-You usually do NOT need to modify components in `src/components/`.
+```bash
+# Clone the repository
+git clone https://github.com/Dhirajsah18/Personal-Portfolio.git
+cd Personal-Portfolio
+
+# Install backend dependencies
+cd server
+npm install
+
+# Install frontend dependencies
+cd ../client
+npm install
+```
+
+### 2. Environment Variables
+
+**Server (`server/.env`):**
+```env
+PORT=5000
+NODE_ENV=development
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+ADMIN_EMAIL=your_admin_email
+ADMIN_PASSWORD=your_admin_password
+```
+
+### 3. Running Locally
+
+```bash
+# Start backend server (from /server)
+npm run dev
+
+# Start frontend development server (from /client)
+npm run dev
+```
 
 ---
 
-## License
+## Deployment
 
-This project is created by Dhiraj Kumar Sah. 
+- **Frontend:** Deployed on [Vercel](https://vercel.com/)
+- **Backend:** Deployed on [Render](https://render.com/)
+
+---
+
+## Contact
+
+**Dhiraj Kumar Sah**
+- Portfolio: [dhirajsah18.vercel.app](https://dhirajsah18.vercel.app/)
+- LinkedIn: [linkedin.com/in/dhirajsah18](https://www.linkedin.com/in/dhirajsah18/)
+

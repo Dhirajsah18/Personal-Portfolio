@@ -5,11 +5,13 @@ import { useTheme } from "../context/ThemeContext";
 import { navLinks, profile } from "../data";
 import { api } from "../services/api";
 
-const Navbar = () => {
+const Navbar = ({ resumeUrl }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("about");
   const { theme, toggleTheme } = useTheme();
+
+  const activeResumeUrl = resumeUrl || profile.resumeUrl;
 
 
   useEffect(() => {
@@ -89,8 +91,10 @@ const Navbar = () => {
           <div className="flex items-center gap-3">
             {/* Quick CV Button */}
             <a
-              href={profile.resumeUrl}
+              href={activeResumeUrl}
               download
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => api.trackResumeDownload()}
               className="hidden sm:inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold border transition-all hover:scale-105"
               style={{
@@ -158,8 +162,10 @@ const Navbar = () => {
               style={{ borderColor: "var(--glass-border)" }}
             >
               <a
-                href={profile.resumeUrl}
+                href={activeResumeUrl}
                 download
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => {
                   api.trackResumeDownload();
                   setIsOpen(false);

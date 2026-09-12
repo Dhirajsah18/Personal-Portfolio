@@ -23,13 +23,15 @@ import {
   FiChevronUp,
   FiChevronDown,
   FiLayers,
+  FiFileText,
 } from "react-icons/fi";
 import { api } from "../../services/api";
 import ProjectModal from "./ProjectModal";
 import SkillModal from "./SkillModal";
-import videoSummarizerImg from "../../assets/video-summarizer.jpg";
-import creativeShowcaseImg from "../../assets/creative-showcase.jpg";
-import vtubeImg from "/vtube.jpg";
+import ResumeManager from "./ResumeManager";
+import videoSummarizerImg from "../../assets/video-summarizer.webp";
+import creativeShowcaseImg from "../../assets/creative-showcase.webp";
+import vtubeImg from "/vtube.webp";
 
 const imageMap = {
   "video-summarizer": videoSummarizerImg,
@@ -232,6 +234,7 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
     { id: "projects", label: "Projects Manager", icon: FiFolder, count: projects.length },
     { id: "overview", label: "Analytics Overview", icon: FiActivity },
     { id: "skills", label: "Skills & Capabilities", icon: FiCpu, count: skills.length },
+    { id: "resume", label: "Resume / CV", icon: FiFileText },
     {
       id: "messages",
       label: "Messages Inbox",
@@ -284,17 +287,19 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
         >
           <div className="flex items-center gap-3">
             <div
-              className="w-11 h-11 rounded-2xl flex items-center justify-center text-white font-display font-black text-xl shadow-lg"
+              className="w-11 h-11 rounded-2xl flex items-center justify-center text-white font-display font-black text-xl shadow-lg shrink-0"
               style={{ background: "var(--accent-gradient)" }}
             >
               D
             </div>
-            <div>
-              <h2 className="font-bold font-display text-base tracking-tight flex items-center gap-1.5">
+            <div className="flex flex-col items-start">
+              <h2 className="font-bold font-display text-base tracking-tight flex items-center">
                 <span>Dhiraj</span>
                 <span style={{ color: "var(--accent)" }}>.dev</span>
+              </h2>
+              <div className="mt-1">
                 <span
-                  className="text-[10px] font-mono px-2 py-0.5 rounded-full border font-bold ml-1"
+                  className="text-[10px] font-mono px-2 py-0.5 rounded-full border font-bold inline-block"
                   style={{
                     borderColor: "var(--glass-border)",
                     color: "var(--accent)",
@@ -302,12 +307,6 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
                   }}
                 >
                   Admin
-                </span>
-              </h2>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 radar-beacon" />
-                <span className="text-[10px] font-mono font-semibold text-emerald-400">
-                  Atlas Connected
                 </span>
               </div>
             </div>
@@ -441,6 +440,7 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
               {activeTab === "projects" && "Projects Manager"}
               {activeTab === "overview" && "Analytics Overview"}
               {activeTab === "skills" && "Skills & Capabilities"}
+              {activeTab === "resume" && "Resume & CV Management"}
               {activeTab === "messages" && "Messages Inbox"}
             </h1>
           </div>
@@ -470,7 +470,7 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
                   setSelectedProject(null);
                   setProjectModalOpen(true);
                 }}
-                className="btn-primary btn-shine flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold shadow-md"
+                className="btn-primary btn-shine hidden md:flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold shadow-md"
               >
                 <FiPlus size={15} />
                 <span>Add Project</span>
@@ -483,7 +483,7 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
                   setSelectedSkill(null);
                   setSkillModalOpen(true);
                 }}
-                className="btn-primary btn-shine flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold shadow-md"
+                className="btn-primary btn-shine hidden md:flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold shadow-md"
               >
                 <FiPlus size={15} />
                 <span>Add Category</span>
@@ -511,9 +511,9 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
             <div className="space-y-6 max-w-7xl mx-auto">
               {/* Category Filter Tabs matching Frontend Projects */}
               <div className="flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                <div className="flex items-center gap-2.5 overflow-x-auto p-2 pl-3">
                   {[
-                    { id: "all", label: "All Projects (Reorderable)" },
+                    { id: "all", label: "All Projects" },
                     { id: "fullstack", label: "Full-Stack MERN" },
                     { id: "ai", label: "AI & Tools" },
                     { id: "backend", label: "Backend & APIs" },
@@ -522,10 +522,10 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
                     <button
                       key={tab.id}
                       onClick={() => setProjectFilter(tab.id)}
-                      className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 border ${
+                      className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 border shrink-0 ${
                         projectFilter === tab.id
                           ? "text-white border-transparent shadow-md scale-105"
-                          : "glass border-[var(--glass-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent)]"
+                          : "glass border-[var(--glass-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent)] hover:scale-[1.02]"
                       }`}
                       style={
                         projectFilter === tab.id
@@ -881,10 +881,12 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
                       <FiEye size={18} />
                     </div>
                   </div>
-                  <div className="text-4xl font-extrabold font-display heading-accent mb-1" style={{ color: "var(--text-primary)" }}>
-                    {stats?.totalVisits ?? 0}
+                  <div className="my-1">
+                    <div className="text-4xl font-extrabold font-display heading-accent mb-4" style={{ color: "var(--text-primary)" }}>
+                      {stats?.totalVisits ?? 0}
+                    </div>
                   </div>
-                  <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  <p className="text-[11px] mt-2" style={{ color: "var(--text-muted)" }}>
                     Cumulative pageviews recorded
                   </p>
                 </div>
@@ -899,10 +901,12 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
                       <FiUsers size={18} />
                     </div>
                   </div>
-                  <div className="text-4xl font-extrabold font-display heading-accent mb-1" style={{ color: "var(--text-primary)" }}>
-                    {stats?.uniqueVisitors ?? 0}
+                  <div className="my-1">
+                    <div className="text-4xl font-extrabold font-display heading-accent mb-4" style={{ color: "var(--text-primary)" }}>
+                      {stats?.uniqueVisitors ?? 0}
+                    </div>
                   </div>
-                  <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  <p className="text-[11px] mt-2" style={{ color: "var(--text-muted)" }}>
                     Distinct visitor devices / IPs
                   </p>
                 </div>
@@ -917,10 +921,12 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
                       <FiDownload size={18} />
                     </div>
                   </div>
-                  <div className="text-4xl font-extrabold font-display heading-accent mb-1" style={{ color: "var(--text-primary)" }}>
-                    {stats?.totalDownloads ?? 0}
+                  <div className="my-1">
+                    <div className="text-4xl font-extrabold font-display heading-accent mb-4" style={{ color: "var(--text-primary)" }}>
+                      {stats?.totalDownloads ?? 0}
+                    </div>
                   </div>
-                  <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  <p className="text-[11px] mt-2" style={{ color: "var(--text-muted)" }}>
                     Resume download requests
                   </p>
                 </div>
@@ -935,10 +941,12 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
                       <FiMail size={18} />
                     </div>
                   </div>
-                  <div className="text-4xl font-extrabold font-display heading-accent mb-1" style={{ color: "var(--text-primary)" }}>
-                    {stats?.totalMessages ?? 0}
+                  <div className="my-1">
+                    <div className="text-4xl font-extrabold font-display heading-accent mb-4" style={{ color: "var(--text-primary)" }}>
+                      {stats?.totalMessages ?? 0}
+                    </div>
                   </div>
-                  <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  <p className="text-[11px] mt-2" style={{ color: "var(--text-muted)" }}>
                     <span className="font-bold" style={{ color: "var(--accent)" }}>
                       {stats?.unreadMessages ?? 0}
                     </span>{" "}
@@ -960,7 +968,7 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
                     </span>
                   </div>
 
-                  <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                  <div className="space-y-2.5 max-h-80 overflow-y-auto p-1.5 pr-2">
                     {(!stats?.recentVisits || stats.recentVisits.length === 0) ? (
                       <div className="py-12 text-center text-xs" style={{ color: "var(--text-muted)" }}>
                         No visits recorded yet.
@@ -969,7 +977,7 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
                       stats.recentVisits.map((v, i) => (
                         <div
                           key={v._id || i}
-                          className="glass pill-hover flex items-center justify-between p-3.5 rounded-2xl border text-xs"
+                          className="glass flex items-center justify-between p-3.5 rounded-2xl border text-xs transition-all duration-200 hover:border-[var(--accent)] hover:bg-white/[0.04] hover:translate-x-1 hover:shadow-md"
                           style={{ borderColor: "var(--glass-border)" }}
                         >
                           <div className="min-w-0 pr-3">
@@ -1000,7 +1008,7 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
                     </span>
                   </div>
 
-                  <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                  <div className="space-y-2.5 max-h-80 overflow-y-auto p-1.5 pr-2">
                     {(!stats?.recentDownloads || stats.recentDownloads.length === 0) ? (
                       <div className="py-12 text-center text-xs" style={{ color: "var(--text-muted)" }}>
                         No downloads recorded yet.
@@ -1009,7 +1017,7 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
                       stats.recentDownloads.map((d, i) => (
                         <div
                           key={d._id || i}
-                          className="glass pill-hover flex items-center justify-between p-3.5 rounded-2xl border text-xs"
+                          className="glass flex items-center justify-between p-3.5 rounded-2xl border text-xs transition-all duration-200 hover:border-[var(--accent)] hover:bg-white/[0.04] hover:translate-x-1 hover:shadow-md"
                           style={{ borderColor: "var(--glass-border)" }}
                         >
                           <div className="min-w-0 pr-3">
@@ -1103,12 +1111,17 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
             </div>
           )}
 
+          {/* ===================== TAB: RESUME MANAGEMENT ===================== */}
+          {activeTab === "resume" && (
+            <ResumeManager onResumeUpdated={onDataUpdated} refreshTrigger={loading} />
+          )}
+
           {/* ===================== TAB: MESSAGES INBOX ===================== */}
           {activeTab === "messages" && (
             <div className="space-y-6 max-w-7xl mx-auto">
               {/* Message Filter Tabs */}
               <div className="flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5 overflow-x-auto p-1.5 pl-2.5">
                   {[
                     { id: "all", label: `All Messages (${messages.length})` },
                     { id: "unread", label: `Unread (${unreadCount})` },
@@ -1117,10 +1130,10 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
                     <button
                       key={tab.id}
                       onClick={() => setMessageFilter(tab.id)}
-                      className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 border ${
+                      className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 border shrink-0 ${
                         messageFilter === tab.id
                           ? "text-white border-transparent shadow-md scale-105"
-                          : "glass border-[var(--glass-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent)]"
+                          : "glass border-[var(--glass-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent)] hover:scale-[1.02]"
                       }`}
                       style={
                         messageFilter === tab.id
@@ -1237,6 +1250,45 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
             </div>
           )}
         </main>
+      </div>
+
+      {/* Mobile Floating Action Button (FAB) for Projects & Skills */}
+      <div className="md:hidden fixed bottom-6 right-6 z-40 pointer-events-auto flex flex-col items-end">
+        {activeTab === "projects" && (
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedProject(null);
+              setProjectModalOpen(true);
+            }}
+            className="btn-primary btn-shine inline-flex items-center gap-2 px-5 py-3 rounded-full text-xs font-bold shadow-2xl transition-transform active:scale-95 cursor-pointer"
+            style={{
+              boxShadow: "0 8px 25px -2px rgba(234, 88, 12, 0.6), 0 4px 10px -2px rgba(0, 0, 0, 0.5)",
+            }}
+            aria-label="Add Project"
+          >
+            <FiPlus size={16} />
+            <span>Add Project</span>
+          </button>
+        )}
+
+        {activeTab === "skills" && (
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedSkill(null);
+              setSkillModalOpen(true);
+            }}
+            className="btn-primary btn-shine inline-flex items-center gap-2 px-5 py-3 rounded-full text-xs font-bold shadow-2xl transition-transform active:scale-95 cursor-pointer"
+            style={{
+              boxShadow: "0 8px 25px -2px rgba(234, 88, 12, 0.6), 0 4px 10px -2px rgba(0, 0, 0, 0.5)",
+            }}
+            aria-label="Add Category"
+          >
+            <FiPlus size={16} />
+            <span>Add Category</span>
+          </button>
+        )}
       </div>
 
       {/* Child Modals */}

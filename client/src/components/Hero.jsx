@@ -2,14 +2,16 @@ import { useState, useEffect } from "react";
 import { FaLinkedin, FaGithub, FaEnvelope, FaReact, FaNodeJs } from "react-icons/fa";
 import { SiMongodb } from "react-icons/si";
 import { FiArrowDownRight, FiDownload, FiZap, FiCheckCircle } from "react-icons/fi";
-import profileImg from "../assets/profile.jpg";
+import profileImg from "../assets/profile.webp";
 import { profile } from "../data";
 import { useReveal } from "../hooks/useReveal";
 import { api } from "../services/api";
 
-const Hero = () => {
+const Hero = ({ resumeUrl }) => {
   const ref = useReveal();
   const [roleIndex, setRoleIndex] = useState(0);
+
+  const activeResumeUrl = resumeUrl || profile.resumeUrl;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -71,8 +73,10 @@ const Hero = () => {
             </a>
 
             <a
-              href={profile.resumeUrl}
+              href={activeResumeUrl}
               download
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => api.trackResumeDownload()}
               className="glass pill-hover inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-semibold text-sm border"
               style={{

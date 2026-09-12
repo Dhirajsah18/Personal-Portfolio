@@ -4,9 +4,9 @@ import { FiExternalLink, FiGithub, FiX, FiFolder, FiCheckCircle, FiMaximize2 } f
 import { projects as staticProjects } from "../data";
 import { useReveal } from "../hooks/useReveal";
 import { api } from "../services/api";
-import videoSummarizerImg from "../assets/video-summarizer.jpg";
-import creativeShowcaseImg from "../assets/creative-showcase.jpg";
-import vtubeImg from "/vtube.jpg";
+import videoSummarizerImg from "../assets/video-summarizer.webp";
+import creativeShowcaseImg from "../assets/creative-showcase.webp";
+import vtubeImg from "/vtube.webp";
 
 const imageMap = {
   "video-summarizer": videoSummarizerImg,

@@ -19,6 +19,13 @@ const defaultData = {
     totalVisits: 0,
     totalDownloads: 0,
   },
+  resume: {
+    filename: "Dhiraj_Kumar_Sah_Resume.pdf",
+    originalName: "resume.pdf",
+    size: 0,
+    customUrl: "",
+    updatedAt: null,
+  },
 };
 
 export const initLocalStore = () => {

@@ -21,6 +21,22 @@ function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [resumeUrl, setResumeUrl] = useState("/api/resume/download");
+
+  // Fetch dynamic active resume URL from backend
+  useEffect(() => {
+    const loadResume = async () => {
+      try {
+        const data = await api.getResume();
+        if (data?.url) {
+          setResumeUrl(data.url);
+        }
+      } catch {
+        // Fallback remains /api/resume/download or /resume.pdf
+      }
+    };
+    loadResume();
+  }, [refreshTrigger]);
 
   // Track visitor analytics once per session (ignore secret admin visits from analytics)
   useEffect(() => {
@@ -111,9 +127,9 @@ function App() {
   return (
     <ThemeProvider>
       <Background />
-      <Navbar />
+      <Navbar resumeUrl={resumeUrl} />
       <main>
-        <Hero />
+        <Hero resumeUrl={resumeUrl} />
         <SectionDivider />
         <Skills refreshTrigger={refreshTrigger} />
         <SectionDivider />

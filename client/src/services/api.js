@@ -9,6 +9,11 @@ const getAuthHeaders = () => {
   };
 };
 
+const getAuthBearer = () => {
+  const token = localStorage.getItem("portfolio_admin_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 export const api = {
   // Auth
   async login(email, password) {
@@ -195,5 +200,35 @@ export const api = {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Failed to fetch stats");
     return data.data;
+  },
+
+  // Resume Management
+  async getResume() {
+    const res = await fetch(`${API_BASE}/resume`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed to fetch resume");
+    return data.data;
+  },
+
+  async uploadResume(formData) {
+    const res = await fetch(`${API_BASE}/resume/upload`, {
+      method: "POST",
+      headers: getAuthBearer(),
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed to upload resume");
+    return data;
+  },
+
+  async updateResumeUrl(customUrl) {
+    const res = await fetch(`${API_BASE}/resume/url`, {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ customUrl }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed to update resume URL");
+    return data;
   },
 };

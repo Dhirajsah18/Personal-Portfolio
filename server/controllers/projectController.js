@@ -1,6 +1,24 @@
 import Project from "../models/Project.js";
 import { getDbStatus } from "../config/db.js";
 import { readStore, writeStore, generateId } from "../utils/localStore.js";
+import { compressImage } from "../utils/compressionHelper.js";
+
+// Helper to auto-compress base64 images to WebP before storing in MongoDB or local storage
+const processImageCompression = async (img) => {
+  if (!img || typeof img !== "string") return img;
+  if (img.startsWith("data:image/") && img.includes(";base64,")) {
+    try {
+      const base64Data = img.split(";base64,").pop();
+      const buffer = Buffer.from(base64Data, "base64");
+      const compressedBuffer = await compressImage(buffer, { maxWidth: 1280, maxHeight: 1280, quality: 80 });
+      return `data:image/webp;base64,${compressedBuffer.toString("base64")}`;
+    } catch (e) {
+      console.warn("Could not compress base64 image:", e.message);
+      return img;
+    }
+  }
+  return img;
+};
 
 // GET /api/projects
 export const getProjects = async (req, res) => {
@@ -82,6 +100,8 @@ export const createProject = async (req, res) => {
       ? tech.split(",").map((s) => s.trim()).filter(Boolean)
       : [];
 
+    const optimizedImage = await processImageCompression(image || "");
+
     const newProjectData = {
       title,
       slug,
@@ -90,7 +110,7 @@ export const createProject = async (req, res) => {
       description,
       highlights: formattedHighlights,
       tech: formattedTech,
-      image: image || "",
+      image: optimizedImage,
       github: github || "",
       link: link || "",
       featured: Boolean(featured),
@@ -171,7 +191,7 @@ export const updateProject = async (req, res) => {
     if (description !== undefined) updateFields.description = description;
     if (formattedHighlights !== undefined) updateFields.highlights = formattedHighlights;
     if (formattedTech !== undefined) updateFields.tech = formattedTech;
-    if (image !== undefined) updateFields.image = image;
+    if (image !== undefined) updateFields.image = await processImageCompression(image);
     if (github !== undefined) updateFields.github = github;
     if (link !== undefined) updateFields.link = link;
     if (featured !== undefined) updateFields.featured = Boolean(featured);

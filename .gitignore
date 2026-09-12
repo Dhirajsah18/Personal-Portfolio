@@ -16,6 +16,7 @@ dist/
 
 # Local fallback data & logs
 server/data/store.json
+server/uploads/
 *.log
 
 # IDE & OS
