@@ -1,8 +1,35 @@
 const rawApiBase = import.meta.env.VITE_API_BASE_URL || "/api";
 const API_BASE = rawApiBase.endsWith("/") ? rawApiBase.slice(0, -1) : rawApiBase;
 
+/**
+ * Checks if a JWT token exists and has not expired (7-day validity check)
+ */
+export const isTokenExpired = (token) => {
+  if (!token) return true;
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return true;
+    const payload = JSON.parse(atob(parts[1]));
+    if (!payload.exp) return false;
+    // Buffer by 5 seconds
+    return payload.exp * 1000 <= Date.now() + 5000;
+  } catch {
+    return true;
+  }
+};
+
+export const handleAuthExpired = () => {
+  localStorage.removeItem("portfolio_admin_token");
+  localStorage.removeItem("portfolio_admin_user");
+  window.dispatchEvent(new CustomEvent("portfolio:auth-expired"));
+};
+
 const getAuthHeaders = () => {
   const token = localStorage.getItem("portfolio_admin_token");
+  if (isTokenExpired(token)) {
+    if (token) handleAuthExpired();
+    return { "Content-Type": "application/json" };
+  }
   return {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -11,7 +38,31 @@ const getAuthHeaders = () => {
 
 const getAuthBearer = () => {
   const token = localStorage.getItem("portfolio_admin_token");
+  if (isTokenExpired(token)) {
+    if (token) handleAuthExpired();
+    return {};
+  }
   return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+const handleResponse = async (res) => {
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    data = {};
+  }
+
+  if (res.status === 401) {
+    handleAuthExpired();
+    throw new Error(data.message || "Session expired. Please log in again.");
+  }
+
+  if (!res.ok) {
+    throw new Error(data.message || `Request failed with status ${res.status}`);
+  }
+
+  return data;
 };
 
 export const api = {
@@ -22,25 +73,20 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Login failed");
-    return data;
+    return handleResponse(res);
   },
 
   async getMe() {
     const res = await fetch(`${API_BASE}/auth/me`, {
       headers: getAuthHeaders(),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to fetch profile");
-    return data;
+    return handleResponse(res);
   },
 
   // Projects
   async getProjects() {
     const res = await fetch(`${API_BASE}/projects`);
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to fetch projects");
+    const data = await handleResponse(res);
     return data.data;
   },
 
@@ -50,8 +96,7 @@ export const api = {
       headers: getAuthHeaders(),
       body: JSON.stringify(projectData),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to create project");
+    const data = await handleResponse(res);
     return data.data;
   },
 
@@ -61,8 +106,7 @@ export const api = {
       headers: getAuthHeaders(),
       body: JSON.stringify(projectData),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to update project");
+    const data = await handleResponse(res);
     return data.data;
   },
 
@@ -71,9 +115,7 @@ export const api = {
       method: "DELETE",
       headers: getAuthHeaders(),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to delete project");
-    return data;
+    return handleResponse(res);
   },
 
   async reorderProjects(projectIds) {
@@ -82,16 +124,13 @@ export const api = {
       headers: getAuthHeaders(),
       body: JSON.stringify({ projectIds }),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to reorder projects");
-    return data;
+    return handleResponse(res);
   },
 
   // Skills
   async getSkills() {
     const res = await fetch(`${API_BASE}/skills`);
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to fetch skills");
+    const data = await handleResponse(res);
     return data.data;
   },
 
@@ -101,8 +140,7 @@ export const api = {
       headers: getAuthHeaders(),
       body: JSON.stringify(skillData),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to create skill");
+    const data = await handleResponse(res);
     return data.data;
   },
 
@@ -112,8 +150,7 @@ export const api = {
       headers: getAuthHeaders(),
       body: JSON.stringify(skillData),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to update skill");
+    const data = await handleResponse(res);
     return data.data;
   },
 
@@ -122,9 +159,7 @@ export const api = {
       method: "DELETE",
       headers: getAuthHeaders(),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to delete skill");
-    return data;
+    return handleResponse(res);
   },
 
   // Contact
@@ -134,18 +169,14 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(contactData),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to send message");
-    return data;
+    return handleResponse(res);
   },
 
   async getMessages() {
     const res = await fetch(`${API_BASE}/contact`, {
       headers: getAuthHeaders(),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to fetch messages");
-    return data;
+    return handleResponse(res);
   },
 
   async markMessageRead(id, isRead = true) {
@@ -154,8 +185,7 @@ export const api = {
       headers: getAuthHeaders(),
       body: JSON.stringify({ isRead }),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to update status");
+    const data = await handleResponse(res);
     return data.data;
   },
 
@@ -164,9 +194,7 @@ export const api = {
       method: "DELETE",
       headers: getAuthHeaders(),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to delete message");
-    return data;
+    return handleResponse(res);
   },
 
   // Analytics
@@ -197,16 +225,14 @@ export const api = {
     const res = await fetch(`${API_BASE}/analytics/stats`, {
       headers: getAuthHeaders(),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to fetch stats");
+    const data = await handleResponse(res);
     return data.data;
   },
 
   // Resume Management
   async getResume() {
     const res = await fetch(`${API_BASE}/resume`);
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to fetch resume");
+    const data = await handleResponse(res);
     return data.data;
   },
 
@@ -216,9 +242,7 @@ export const api = {
       headers: getAuthBearer(),
       body: formData,
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to upload resume");
-    return data;
+    return handleResponse(res);
   },
 
   async updateResumeUrl(customUrl) {
@@ -227,8 +251,6 @@ export const api = {
       headers: getAuthHeaders(),
       body: JSON.stringify({ customUrl }),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to update resume URL");
-    return data;
+    return handleResponse(res);
   },
 };

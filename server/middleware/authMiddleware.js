@@ -16,10 +16,14 @@ export const protect = async (req, res, next) => {
       req.user = decoded;
       return next();
     } catch (error) {
-      console.error("JWT verification failed:", error.message);
+      console.warn("JWT verification failed:", error.message);
+      const isExpired = error.name === "TokenExpiredError";
       return res.status(401).json({
         success: false,
-        message: "Not authorized, token failed or expired",
+        message: isExpired
+          ? "Session expired. Please log in again."
+          : "Not authorized, token invalid",
+        isExpired: true,
       });
     }
   }
@@ -28,6 +32,7 @@ export const protect = async (req, res, next) => {
     return res.status(401).json({
       success: false,
       message: "Not authorized, no token provided",
+      isExpired: true,
     });
   }
 };

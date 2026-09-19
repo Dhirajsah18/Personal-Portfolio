@@ -9,7 +9,7 @@ import Education from "./components/Education";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import SectionDivider from "./components/SectionDivider";
-import { api } from "./services/api";
+import { api, isTokenExpired } from "./services/api";
 
 const AdminLoginModal = lazy(() => import("./components/admin/AdminLoginModal"));
 const AdminDashboard = lazy(() => import("./components/admin/AdminDashboard"));
@@ -17,7 +17,15 @@ const AdminDashboard = lazy(() => import("./components/admin/AdminDashboard"));
 const ADMIN_PATH = import.meta.env.VITE_ADMIN_PATH || "/admin-login";
 
 function App() {
-  const [token, setToken] = useState(localStorage.getItem("portfolio_admin_token") || null);
+  const [token, setToken] = useState(() => {
+    const savedToken = localStorage.getItem("portfolio_admin_token");
+    if (savedToken && !isTokenExpired(savedToken)) {
+      return savedToken;
+    }
+    localStorage.removeItem("portfolio_admin_token");
+    localStorage.removeItem("portfolio_admin_user");
+    return null;
+  });
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -50,6 +58,25 @@ function App() {
         sessionStorage.setItem("portfolio_visited", "true");
       }
     }
+  }, []);
+
+  // Listen for automatic token expiration logout event
+  useEffect(() => {
+    const onAuthExpired = () => {
+      setToken(null);
+      setIsDashboardOpen(false);
+      const currentPath = window.location.pathname.toLowerCase();
+      const currentHash = window.location.hash.toLowerCase();
+      const targetPath = ADMIN_PATH.toLowerCase();
+      const targetHash = `#${targetPath.replace(/^\//, "")}`;
+
+      if (currentPath === targetPath || currentHash === targetHash) {
+        setIsLoginOpen(true);
+      }
+    };
+
+    window.addEventListener("portfolio:auth-expired", onAuthExpired);
+    return () => window.removeEventListener("portfolio:auth-expired", onAuthExpired);
   }, []);
 
   // Listen to secret Admin URL (e.g. /admin-login or #admin-login)
