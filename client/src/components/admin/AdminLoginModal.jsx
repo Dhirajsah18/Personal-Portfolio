@@ -29,11 +29,6 @@ const AdminLoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
     }
   };
 
-  const handleQuickFill = () => {
-    setEmail("dhirajsah2003@gmail.com");
-    setPassword("Admin@12345");
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
       <div
@@ -85,7 +80,7 @@ const AdminLoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="dhirajsah2003@gmail.com"
+                placeholder="admin@example.com"
                 className="w-full border rounded-xl pl-10 pr-4 py-2.5 text-sm glass focus:ring-2 focus:ring-[var(--accent)] outline-none"
                 style={{ borderColor: "var(--glass-border)", color: "var(--text-primary)" }}
               />
@@ -118,16 +113,6 @@ const AdminLoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
                 {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
               </button>
             </div>
-          </div>
-
-          <div className="flex items-center justify-between pt-1">
-            <button
-              type="button"
-              onClick={handleQuickFill}
-              className="text-xs text-[var(--accent)] hover:underline font-semibold"
-            >
-              Fill Default Demo
-            </button>
           </div>
 
           <button
