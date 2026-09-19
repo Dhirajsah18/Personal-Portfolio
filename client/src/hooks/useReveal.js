@@ -1,11 +1,6 @@
 import { useEffect, useRef } from "react";
 
-/**
- * Attaches an IntersectionObserver to a ref and toggles the
- * `in-view` class on children marked with `.reveal` when they
- * scroll into the viewport.
- */
-export const useReveal = () => {
+export const useReveal = (deps = []) => {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -25,12 +20,22 @@ export const useReveal = () => {
           }
         });
       },
-      { threshold: 0.15 }
+      { threshold: 0.1 }
     );
 
-    targets.forEach((el) => observer.observe(el));
+    targets.forEach((el) => {
+      // If already in viewport, trigger in-view immediately
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        el.classList.add("in-view");
+      } else {
+        observer.observe(el);
+      }
+    });
+
     return () => observer.disconnect();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
 
   return containerRef;
 };

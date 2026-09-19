@@ -1,24 +1,34 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { FiExternalLink, FiGithub, FiX, FiFolder, FiCheckCircle, FiMaximize2 } from "react-icons/fi";
+import {
+  FiExternalLink,
+  FiGithub,
+  FiX,
+  FiFolder,
+  FiCheckCircle,
+  FiMaximize2,
+  FiChevronDown,
+  FiChevronUp,
+  FiGrid,
+} from "react-icons/fi";
 import { projects as staticProjects } from "../data";
 import { useReveal } from "../hooks/useReveal";
 import { api } from "../services/api";
-import videoSummarizerImg from "../assets/video-summarizer.webp";
-import creativeShowcaseImg from "../assets/creative-showcase.webp";
-import vtubeImg from "/vtube.webp";
-
-const imageMap = {
-  "video-summarizer": videoSummarizerImg,
-  "creative-showcase": creativeShowcaseImg,
-  vtube: vtubeImg,
+const getProjectImageUrl = (image) => {
+  if (!image) return null;
+  if (image.startsWith("http://") || image.startsWith("https://") || image.startsWith("data:image/")) {
+    return image;
+  }
+  if (image === "vtube") return "/vtube.webp";
+  return null;
 };
 
 const Projects = ({ refreshTrigger }) => {
-  const ref = useReveal();
   const [selected, setSelected] = useState(null);
   const [activeCategory, setActiveCategory] = useState("all");
+  const [showAll, setShowAll] = useState(false);
   const [projectList, setProjectList] = useState(staticProjects);
+  const ref = useReveal([projectList, activeCategory, showAll]);
 
   useEffect(() => {
     let isMounted = true;
@@ -64,6 +74,8 @@ const Projects = ({ refreshTrigger }) => {
       ? projectList
       : projectList.filter((p) => p.category === activeCategory);
 
+  const displayedProjects = showAll ? filteredProjects : filteredProjects.slice(0, 4);
+
   return (
     <section id="projects" className="section-tint tint-cyan py-16 sm:py-20 px-4">
       <div ref={ref} className="max-w-6xl mx-auto">
@@ -94,7 +106,10 @@ const Projects = ({ refreshTrigger }) => {
           {filterTabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveCategory(tab.id)}
+              onClick={() => {
+                setActiveCategory(tab.id);
+                setShowAll(false);
+              }}
               className={`px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 border ${
                 activeCategory === tab.id
                   ? "bg-[var(--accent)] text-white border-transparent shadow-md scale-105"
@@ -108,12 +123,12 @@ const Projects = ({ refreshTrigger }) => {
 
         {/* Projects Grid */}
         <div className="grid md:grid-cols-2 gap-6">
-          {filteredProjects.map((project, i) => {
-            const img = project.image ? (imageMap[project.image] || project.image) : null;
+          {displayedProjects.map((project, i) => {
+            const img = getProjectImageUrl(project.image);
 
             return (
               <div
-                key={project.title}
+                key={project._id || project.slug || project.title || i}
                 className="reveal card-hover glass flex flex-col justify-between p-6 sm:p-7 rounded-3xl group"
                 style={{ transitionDelay: `${i * 90}ms` }}
               >
@@ -240,6 +255,28 @@ const Projects = ({ refreshTrigger }) => {
             );
           })}
         </div>
+
+        {/* View All / Show Less Toggle Button */}
+        {filteredProjects.length > 4 && (
+          <div className="reveal flex justify-center mt-12">
+            <button
+              type="button"
+              onClick={() => setShowAll((prev) => !prev)}
+              className="btn-shine glass pill-hover inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full text-xs sm:text-sm font-bold border transition-all duration-300 hover:scale-105 shadow-lg cursor-pointer"
+              style={{
+                borderColor: "var(--glass-border)",
+                color: "var(--text-primary)",
+                background: "var(--glass-bg)",
+              }}
+            >
+              <FiGrid size={15} style={{ color: "var(--accent)" }} />
+              <span>
+                {showAll ? "Show Less" : `View All Projects (${filteredProjects.length})`}
+              </span>
+              {showAll ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Immersive Single-Page Project Case Study Modal (Portaled to document.body) */}
@@ -281,21 +318,21 @@ const Projects = ({ refreshTrigger }) => {
                 </button>
               </div>
 
-              {/* Modal Content: Responsive 2-Column Single Screen View */}
-              <div className="overflow-y-auto lg:overflow-visible p-6 sm:p-8">
+              {/* Modal Content: Responsive 2-Column Scrollable View */}
+              <div className="overflow-y-auto max-h-[calc(90vh-65px)] p-6 sm:p-8 space-y-6">
                 <div className="grid lg:grid-cols-[1.1fr_1fr] gap-6 lg:gap-8 items-start">
                   {/* LEFT COLUMN: Visual Media & Action CTAs */}
                   <div className="space-y-4">
-                    {selected.image ? (
-                      <div className="relative rounded-2xl overflow-hidden h-52 sm:h-64 lg:h-[300px] border border-[var(--glass-border)] shrink-0 shadow-md">
+                    {getProjectImageUrl(selected.image) ? (
+                      <div className="relative rounded-2xl overflow-hidden h-52 sm:h-64 lg:h-[280px] border border-[var(--glass-border)] shrink-0 shadow-md">
                         <img
-                          src={imageMap[selected.image] || selected.image}
+                          src={getProjectImageUrl(selected.image)}
                           alt={selected.title}
                           className="w-full h-full object-cover"
                         />
                       </div>
                     ) : (
-                      <div className="relative rounded-2xl p-6 h-52 sm:h-64 lg:h-[300px] flex flex-col justify-center items-center text-center border border-[var(--glass-border)] bg-[var(--glass-bg)] shadow-md">
+                      <div className="relative rounded-2xl p-6 h-52 sm:h-64 lg:h-[280px] flex flex-col justify-center items-center text-center border border-[var(--glass-border)] bg-[var(--glass-bg)] shadow-md">
                         <span className="text-sm font-mono text-[var(--accent)] font-bold mb-2">
                           Backend REST API Architecture
                         </span>
@@ -335,7 +372,7 @@ const Projects = ({ refreshTrigger }) => {
                   </div>
 
                   {/* RIGHT COLUMN: Project Details, Deliverables & Stack */}
-                  <div className="space-y-5 flex flex-col justify-between">
+                  <div className="space-y-4 flex flex-col justify-between">
                     <div>
                       <h3
                         className="font-display text-2xl sm:text-3xl font-extrabold mb-2"
@@ -352,19 +389,19 @@ const Projects = ({ refreshTrigger }) => {
                     </div>
 
                     {/* Key Highlights / Deliverables */}
-                    {selected.highlights && (
+                    {selected.highlights && selected.highlights.length > 0 && (
                       <div className="space-y-2">
                         <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--accent)]">
                           Key Architecture & Features
                         </p>
-                        <div className="space-y-2">
+                        <div className="grid sm:grid-cols-2 gap-2">
                           {selected.highlights.map((hl) => (
                             <div
                               key={hl}
-                              className="glass px-3.5 py-2.5 rounded-xl text-xs font-medium flex items-center gap-2.5 border border-[var(--glass-border)]"
+                              className="glass px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2 border border-[var(--glass-border)]"
                             >
-                              <FiCheckCircle size={15} className="text-emerald-400 shrink-0" />
-                              <span style={{ color: "var(--text-primary)" }}>{hl}</span>
+                              <FiCheckCircle size={14} className="text-emerald-400 shrink-0" />
+                              <span className="leading-snug" style={{ color: "var(--text-primary)" }}>{hl}</span>
                             </div>
                           ))}
                         </div>
@@ -372,7 +409,7 @@ const Projects = ({ refreshTrigger }) => {
                     )}
 
                     {/* Technologies Used */}
-                    <div className="space-y-2">
+                    <div className="space-y-2 pt-2 pb-2">
                       <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--accent)]">
                         Tech Stack
                       </p>

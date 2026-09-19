@@ -69,12 +69,15 @@ ADMIN_PASSWORD=your_admin_password
 
 ### 3. Running Locally
 
+You can run both client and server concurrently from the root directory:
+
 ```bash
-# Start backend server (from /server)
+# Start both frontend and backend together
 npm run dev
 
-# Start frontend development server (from /client)
-npm run dev
+# Or run them individually:
+npm run server  # Start backend only
+npm run client  # Start frontend only
 ```
 
 ---

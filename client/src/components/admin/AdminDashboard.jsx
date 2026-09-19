@@ -29,14 +29,13 @@ import { api } from "../../services/api";
 import ProjectModal from "./ProjectModal";
 import SkillModal from "./SkillModal";
 import ResumeManager from "./ResumeManager";
-import videoSummarizerImg from "../../assets/video-summarizer.webp";
-import creativeShowcaseImg from "../../assets/creative-showcase.webp";
-import vtubeImg from "/vtube.webp";
-
-const imageMap = {
-  "video-summarizer": videoSummarizerImg,
-  "creative-showcase": creativeShowcaseImg,
-  vtube: vtubeImg,
+const getProjectImageUrl = (image) => {
+  if (!image) return null;
+  if (image.startsWith("http://") || image.startsWith("https://") || image.startsWith("data:image/")) {
+    return image;
+  }
+  if (image === "vtube") return "/vtube.webp";
+  return null;
 };
 
 const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
@@ -120,10 +119,11 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
     }
   };
 
-  // Drag & Drop Reordering Handlers
+  // Drag & Drop Reordering Handlers (Optimized & Lag-free)
   const handleDragStart = (e, index) => {
     setDraggedIndex(index);
     e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", `${index}`);
   };
 
   const handleDragOver = (e, index) => {
@@ -141,20 +141,20 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
 
   const handleDrop = async (e, dropIndex) => {
     e.preventDefault();
-    if (draggedIndex === null || draggedIndex === dropIndex) {
-      setDraggedIndex(null);
-      setDragOverIndex(null);
+    const sourceIdx = draggedIndex !== null ? draggedIndex : parseInt(e.dataTransfer.getData("text/plain"), 10);
+    
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+
+    if (isNaN(sourceIdx) || sourceIdx === dropIndex || sourceIdx < 0 || sourceIdx >= projects.length) {
       return;
     }
 
     const reordered = [...projects];
-    const [moved] = reordered.splice(draggedIndex, 1);
+    const [moved] = reordered.splice(sourceIdx, 1);
     reordered.splice(dropIndex, 0, moved);
 
     setProjects(reordered);
-    setDraggedIndex(null);
-    setDragOverIndex(null);
-
     await saveNewOrder(reordered);
   };
 
@@ -564,7 +564,7 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
                 {filteredProjects.map((p) => {
                   const globalIndex = projects.findIndex((item) => (item._id || item.slug) === (p._id || p.slug));
                   const isDraggable = projectFilter === "all";
-                  const img = p.image ? (imageMap[p.image] || p.image) : null;
+                  const img = getProjectImageUrl(p.image);
 
                   return (
                     <div
@@ -574,11 +574,11 @@ const AdminDashboard = ({ isOpen, onClose, onLogout, onDataUpdated }) => {
                       onDragOver={(e) => isDraggable && handleDragOver(e, globalIndex)}
                       onDragEnd={handleDragEnd}
                       onDrop={(e) => isDraggable && handleDrop(e, globalIndex)}
-                      className={`glass card-hover rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all group relative border ${
+                      className={`glass card-hover rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-[border-color,opacity,box-shadow] group relative border ${
                         draggedIndex === globalIndex
-                          ? "opacity-30 border-dashed border-[var(--accent)] scale-95"
+                          ? "opacity-30 border-dashed border-[var(--accent)]"
                           : dragOverIndex === globalIndex
-                          ? "border-[var(--accent)] ring-2 ring-[var(--accent)] scale-[1.02]"
+                          ? "border-[var(--accent)] ring-2 ring-[var(--accent)] bg-[var(--accent)]/10"
                           : "border-[var(--glass-border)] hover:border-[var(--accent)]"
                       }`}
                     >

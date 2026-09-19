@@ -2,21 +2,49 @@ import Project from "../models/Project.js";
 import { getDbStatus } from "../config/db.js";
 import { readStore, writeStore, generateId } from "../utils/localStore.js";
 import { compressImage } from "../utils/compressionHelper.js";
+import { isCloudinaryConfigured, uploadBufferToCloudinary } from "../config/cloudinary.js";
 
-// Helper to auto-compress base64 images to WebP before storing in MongoDB or local storage
+// Helper to compress images with Sharp to WebP and upload directly to Cloudinary
 const processImageCompression = async (img) => {
   if (!img || typeof img !== "string") return img;
+
+  // If already an external / Cloudinary URL, keep as is
+  if (img.startsWith("http://") || img.startsWith("https://")) {
+    return img;
+  }
+
+  // If base64 image data from file upload
   if (img.startsWith("data:image/") && img.includes(";base64,")) {
     try {
       const base64Data = img.split(";base64,").pop();
       const buffer = Buffer.from(base64Data, "base64");
-      const compressedBuffer = await compressImage(buffer, { maxWidth: 1280, maxHeight: 1280, quality: 80 });
+      const compressedBuffer = await compressImage(buffer, {
+        maxWidth: 1280,
+        maxHeight: 1280,
+        quality: 80,
+      });
+
+      // Upload to Cloudinary if credentials are configured
+      if (isCloudinaryConfigured()) {
+        try {
+          const result = await uploadBufferToCloudinary(compressedBuffer, "portfolio/projects");
+          if (result && result.secure_url) {
+            console.log("Uploaded project cover image to Cloudinary:", result.secure_url);
+            return result.secure_url;
+          }
+        } catch (cloudErr) {
+          console.error("Cloudinary upload error, fallback to WebP base64:", cloudErr.message);
+        }
+      }
+
+      // Safe fallback: store optimized WebP base64 string
       return `data:image/webp;base64,${compressedBuffer.toString("base64")}`;
     } catch (e) {
-      console.warn("Could not compress base64 image:", e.message);
+      console.warn("Could not process/compress project image:", e.message);
       return img;
     }
   }
+
   return img;
 };
 
