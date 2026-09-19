@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import compression from "compression";
 import { connectDB, getDbStatus } from "./config/db.js";
-import { seedInitialData } from "./utils/seedData.js";
+import { syncAdminAccount } from "./utils/seedData.js";
 import authRoutes from "./routes/authRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import skillRoutes from "./routes/skillRoutes.js";
@@ -71,7 +71,7 @@ app.use((err, req, res, next) => {
 const startServer = async () => {
   try {
     await connectDB();
-    await seedInitialData();
+    await syncAdminAccount();
 
     app.listen(PORT, () => {
       console.log(`Portfolio Backend Server running on port ${PORT}`);

@@ -5,11 +5,7 @@ import { getDbStatus } from "../config/db.js";
 import { readStore } from "../utils/localStore.js";
 
 const generateToken = (id, email) => {
-  return jwt.sign(
-    { id, email },
-    process.env.JWT_SECRET || "super_secret_portfolio_jwt_key_2026_dhiraj",
-    { expiresIn: "7d" }
-  );
+  return jwt.sign({ id, email }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
 
 export const login = async (req, res) => {
@@ -26,12 +22,14 @@ export const login = async (req, res) => {
     const { isMongoConnected } = getDbStatus();
     let adminUser = null;
 
+    const cleanEmail = email.trim().toLowerCase();
+
     if (isMongoConnected) {
-      adminUser = await Admin.findOne({ email: email.toLowerCase() });
+      adminUser = await Admin.findOne({ email: cleanEmail });
     } else {
       const store = readStore();
       adminUser = (store.admins || []).find(
-        (a) => a.email.toLowerCase() === email.toLowerCase()
+        (a) => a.email.toLowerCase() === cleanEmail
       );
     }
 
