@@ -4,10 +4,11 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    const prefersDark = window.matchMedia?.(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-    return prefersDark ? "dark" : "light";
+    const savedTheme = localStorage.getItem("portfolio_theme");
+    if (savedTheme === "dark" || savedTheme === "light") {
+      return savedTheme;
+    }
+    return "light";
   });
 
   useEffect(() => {
@@ -17,6 +18,7 @@ export const ThemeProvider = ({ children }) => {
     } else {
       root.classList.remove("dark");
     }
+    localStorage.setItem("portfolio_theme", theme);
   }, [theme]);
 
   const toggleTheme = () =>
