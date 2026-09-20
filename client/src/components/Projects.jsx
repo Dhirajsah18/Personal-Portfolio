@@ -11,7 +11,6 @@ import {
   FiChevronUp,
   FiGrid,
 } from "react-icons/fi";
-import { projects as staticProjects } from "../data";
 import { useReveal } from "../hooks/useReveal";
 import { api } from "../services/api";
 const getProjectImageUrl = (image) => {
@@ -27,19 +26,26 @@ const Projects = ({ refreshTrigger }) => {
   const [selected, setSelected] = useState(null);
   const [activeCategory, setActiveCategory] = useState("all");
   const [showAll, setShowAll] = useState(false);
-  const [projectList, setProjectList] = useState(staticProjects);
-  const ref = useReveal([projectList, activeCategory, showAll]);
+  const [projectList, setProjectList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const ref = useReveal([projectList, activeCategory, showAll, loading]);
 
   useEffect(() => {
     let isMounted = true;
     api.getProjects()
       .then((data) => {
-        if (isMounted && Array.isArray(data) && data.length > 0) {
-          setProjectList(data);
+        if (isMounted) {
+          if (Array.isArray(data)) {
+            setProjectList(data);
+          }
+          setLoading(false);
         }
       })
       .catch((err) => {
-        console.log("Using static projects data fallback:", err.message);
+        console.error("Failed to load projects:", err.message);
+        if (isMounted) {
+          setLoading(false);
+        }
       });
     return () => { isMounted = false; };
   }, [refreshTrigger]);
@@ -122,142 +128,182 @@ const Projects = ({ refreshTrigger }) => {
         </div>
 
         {/* Projects Grid */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {displayedProjects.map((project, i) => {
-            const img = getProjectImageUrl(project.image);
-
-            return (
+        {loading ? (
+          <div className="grid md:grid-cols-2 gap-6">
+            {[1, 2, 3, 4].map((n) => (
               <div
-                key={project._id || project.slug || project.title || i}
-                className="reveal card-hover glass flex flex-col justify-between p-6 sm:p-7 rounded-3xl group"
-                style={{ transitionDelay: `${i * 90}ms` }}
+                key={n}
+                className="glass flex flex-col justify-between p-6 sm:p-7 rounded-3xl animate-pulse"
+                style={{ borderColor: "var(--glass-border)" }}
               >
                 <div>
-                  {/* Visual Preview / Header */}
-                  {img ? (
-                    <div
-                      onClick={() => setSelected(project)}
-                      className="relative rounded-2xl overflow-hidden mb-4 h-48 cursor-pointer bg-slate-900 border border-[var(--glass-border)]"
-                    >
-                      <img
-                        src={img}
-                        alt={project.title}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
-
-                      {/* Quick view overlay icon */}
-                      <div className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100">
-                        <FiMaximize2 size={16} />
-                      </div>
-                    </div>
-                  ) : (
-                    <div
-                      onClick={() => setSelected(project)}
-                      className="relative rounded-2xl p-5 mb-4 h-36 flex flex-col justify-between cursor-pointer border border-[var(--glass-border)] bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-highlight)]"
-                    >
-                      <span className="px-3 py-1 rounded-full text-[11px] font-bold text-[var(--accent)] border border-[var(--accent)]/30 w-fit">
-                        REST API Architecture
-                      </span>
-                      <p className="font-mono text-xs text-[var(--text-muted)] flex items-center gap-2">
-                        <span>Backend Architecture & Endpoints</span>
-                        <FiMaximize2 size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Title & Description */}
-                  <h3
-                    onClick={() => setSelected(project)}
-                    className="font-display text-xl sm:text-2xl font-bold mb-2 cursor-pointer hover:text-[var(--accent)] transition-colors"
-                    style={{ color: "var(--text-primary)" }}
-                  >
-                    {project.title}
-                  </h3>
-
-                  <p
-                    className="text-xs sm:text-sm line-clamp-2 mb-4 leading-relaxed"
-                    style={{ color: "var(--text-secondary)" }}
-                  >
-                    {project.description}
-                  </p>
+                  <div className="rounded-2xl mb-4 h-48 bg-slate-400/20 dark:bg-slate-700/30" />
+                  <div className="h-6 w-3/4 rounded-lg bg-slate-400/25 dark:bg-slate-700/40 mb-3" />
+                  <div className="h-4 w-full rounded-md bg-slate-400/15 dark:bg-slate-700/25 mb-2" />
+                  <div className="h-4 w-2/3 rounded-md bg-slate-400/15 dark:bg-slate-700/25 mb-4" />
                 </div>
-
-                {/* Card Footer: Bordered Tech Stack Chips with Hover & Action Links */}
                 <div>
-                  {/* Tech stack pills with border and interactive hover */}
-                  <div className="flex flex-wrap gap-1.5 mb-5">
-                    {project.tech.slice(0, 5).map((t) => (
-                      <span
-                        key={t}
-                        className="pill-hover text-xs font-semibold px-2.5 py-1 rounded-xl border transition-all duration-200 cursor-default"
-                        style={{
-                          borderColor: "var(--glass-border)",
-                          background: "var(--glass-bg)",
-                          color: "var(--text-secondary)",
-                        }}
-                      >
-                        {t}
-                      </span>
-                    ))}
+                  <div className="flex gap-2 mb-5">
+                    <div className="h-6 w-16 rounded-xl bg-slate-400/15 dark:bg-slate-700/25" />
+                    <div className="h-6 w-20 rounded-xl bg-slate-400/15 dark:bg-slate-700/25" />
+                    <div className="h-6 w-14 rounded-xl bg-slate-400/15 dark:bg-slate-700/25" />
                   </div>
-
-                  {/* Action Buttons */}
                   <div
-                    className="flex items-center gap-3 pt-4 border-t"
+                    className="pt-4 border-t flex items-center justify-between"
                     style={{ borderColor: "var(--glass-border)" }}
                   >
-                    <button
-                      onClick={() => setSelected(project)}
-                      className="text-xs font-bold flex items-center gap-1 hover:underline"
-                      style={{ color: "var(--accent)" }}
-                    >
-                      Case Study <FiExternalLink size={12} />
-                    </button>
-
-                    <div className="ml-auto flex items-center gap-2">
-                      {project.link && (
-                        <a
-                          href={project.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          title="Open live app"
-                          className="glass icon-ring px-3.5 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 border"
-                          style={{
-                            borderColor: "var(--glass-border)",
-                            color: "var(--text-primary)",
-                          }}
-                        >
-                          <FiExternalLink size={13} style={{ color: "var(--accent)" }} /> Live
-                        </a>
-                      )}
-                      {project.github && (
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          title="View GitHub repository"
-                          className="glass icon-ring px-3.5 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 border"
-                          style={{
-                            borderColor: "var(--glass-border)",
-                            color: "var(--text-primary)",
-                          }}
-                        >
-                          <FiGithub size={13} /> Code
-                        </a>
-                      )}
-                    </div>
+                    <div className="h-5 w-20 rounded-md bg-slate-400/15 dark:bg-slate-700/25" />
+                    <div className="h-7 w-28 rounded-full bg-slate-400/15 dark:bg-slate-700/25" />
                   </div>
                 </div>
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        ) : displayedProjects.length > 0 ? (
+          <div className="grid md:grid-cols-2 gap-6">
+            {displayedProjects.map((project, i) => {
+              const img = getProjectImageUrl(project.image);
+
+              return (
+                <div
+                  key={project._id || project.slug || project.title || i}
+                  className="reveal card-hover glass flex flex-col justify-between p-6 sm:p-7 rounded-3xl group"
+                  style={{ transitionDelay: `${i * 90}ms` }}
+                >
+                  <div>
+                    {/* Visual Preview / Header */}
+                    {img ? (
+                      <div
+                        onClick={() => setSelected(project)}
+                        className="relative rounded-2xl overflow-hidden mb-4 h-48 cursor-pointer bg-slate-900 border border-[var(--glass-border)]"
+                      >
+                        <img
+                          src={img}
+                          alt={project.title}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
+
+                        {/* Quick view overlay icon */}
+                        <div className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100">
+                          <FiMaximize2 size={16} />
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() => setSelected(project)}
+                        className="relative rounded-2xl p-5 mb-4 h-36 flex flex-col justify-between cursor-pointer border border-[var(--glass-border)] bg-gradient-to-br from-[var(--glass-bg)] to-[var(--glass-highlight)]"
+                      >
+                        <span className="px-3 py-1 rounded-full text-[11px] font-bold text-[var(--accent)] border border-[var(--accent)]/30 w-fit">
+                          REST API Architecture
+                        </span>
+                        <p className="font-mono text-xs text-[var(--text-muted)] flex items-center gap-2">
+                          <span>Backend Architecture & Endpoints</span>
+                          <FiMaximize2 size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Title & Description */}
+                    <h3
+                      onClick={() => setSelected(project)}
+                      className="font-display text-xl sm:text-2xl font-bold mb-2 cursor-pointer hover:text-[var(--accent)] transition-colors"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      {project.title}
+                    </h3>
+
+                    <p
+                      className="text-xs sm:text-sm line-clamp-2 mb-4 leading-relaxed"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {project.description}
+                    </p>
+                  </div>
+
+                  {/* Card Footer: Bordered Tech Stack Chips with Hover & Action Links */}
+                  <div>
+                    {/* Tech stack pills with border and interactive hover */}
+                    <div className="flex flex-wrap gap-1.5 mb-5">
+                      {(project.tech || []).slice(0, 5).map((t) => (
+                        <span
+                          key={t}
+                          className="pill-hover text-xs font-semibold px-2.5 py-1 rounded-xl border transition-all duration-200 cursor-default"
+                          style={{
+                            borderColor: "var(--glass-border)",
+                            background: "var(--glass-bg)",
+                            color: "var(--text-secondary)",
+                          }}
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div
+                      className="flex items-center gap-3 pt-4 border-t"
+                      style={{ borderColor: "var(--glass-border)" }}
+                    >
+                      <button
+                        onClick={() => setSelected(project)}
+                        className="text-xs font-bold flex items-center gap-1 hover:underline"
+                        style={{ color: "var(--accent)" }}
+                      >
+                        Case Study <FiExternalLink size={12} />
+                      </button>
+
+                      <div className="ml-auto flex items-center gap-2">
+                        {project.link && (
+                          <a
+                            href={project.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Open live app"
+                            className="glass icon-ring px-3.5 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 border"
+                            style={{
+                              borderColor: "var(--glass-border)",
+                              color: "var(--text-primary)",
+                            }}
+                          >
+                            <FiExternalLink size={13} style={{ color: "var(--accent)" }} /> Live
+                          </a>
+                        )}
+                        {project.github && (
+                          <a
+                            href={project.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="View GitHub repository"
+                            className="glass icon-ring px-3.5 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 border"
+                            style={{
+                              borderColor: "var(--glass-border)",
+                              color: "var(--text-primary)",
+                            }}
+                          >
+                            <FiGithub size={13} /> Code
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-12 glass rounded-3xl p-8 max-w-md mx-auto">
+            <FiFolder size={32} className="mx-auto mb-3 text-[var(--text-muted)] opacity-60" />
+            <p className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
+              No projects found in this category.
+            </p>
+          </div>
+        )}
 
         {/* View All / Show Less Toggle Button */}
-        {filteredProjects.length > 4 && (
+        {!loading && filteredProjects.length > 4 && (
           <div className="reveal flex justify-center mt-12">
             <button
               type="button"

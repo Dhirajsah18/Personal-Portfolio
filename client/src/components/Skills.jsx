@@ -1,25 +1,31 @@
 import { useState, useEffect } from "react";
-import { skills as staticSkills } from "../data";
 import { useReveal } from "../hooks/useReveal";
 import { getSkillIcon, getSkillColor } from "./skillIcons";
 import { FiCode, FiLayers } from "react-icons/fi";
 import { api } from "../services/api";
 
 const Skills = ({ refreshTrigger }) => {
-  const ref = useReveal();
   const [activeTab, setActiveTab] = useState("all");
-  const [skillList, setSkillList] = useState(staticSkills);
+  const [skillList, setSkillList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const ref = useReveal([skillList, activeTab, loading]);
 
   useEffect(() => {
     let isMounted = true;
     api.getSkills()
       .then((data) => {
-        if (isMounted && Array.isArray(data) && data.length > 0) {
-          setSkillList(data);
+        if (isMounted) {
+          if (Array.isArray(data)) {
+            setSkillList(data);
+          }
+          setLoading(false);
         }
       })
       .catch((err) => {
-        console.log("Using static skills data fallback:", err.message);
+        console.error("Failed to load skills:", err.message);
+        if (isMounted) {
+          setLoading(false);
+        }
       });
     return () => { isMounted = false; };
   }, [refreshTrigger]);
@@ -81,53 +87,84 @@ const Skills = ({ refreshTrigger }) => {
         </div>
 
         {/* Bento Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredSkills.map((group, i) => (
-            <div
-              key={group.category}
-              className="reveal card-hover glass p-6 rounded-3xl flex flex-col justify-start"
-              style={{ transitionDelay: `${i * 60}ms` }}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <span className="w-2 h-2 rounded-full bg-[var(--accent)]" />
-                <h3
-                  className="font-display text-base font-bold"
-                  style={{ color: "var(--text-primary)" }}
-                >
-                  {group.category}
-                </h3>
+        {loading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <div
+                key={n}
+                className="glass p-6 rounded-3xl animate-pulse space-y-4"
+                style={{ borderColor: "var(--glass-border)" }}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-400/30 dark:bg-slate-700/50" />
+                  <div className="h-5 w-28 rounded-lg bg-slate-400/20 dark:bg-slate-700/40" />
+                </div>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <div className="h-7 w-20 rounded-xl bg-slate-400/15 dark:bg-slate-700/30" />
+                  <div className="h-7 w-16 rounded-xl bg-slate-400/15 dark:bg-slate-700/30" />
+                  <div className="h-7 w-24 rounded-xl bg-slate-400/15 dark:bg-slate-700/30" />
+                  <div className="h-7 w-18 rounded-xl bg-slate-400/15 dark:bg-slate-700/30" />
+                  <div className="h-7 w-20 rounded-xl bg-slate-400/15 dark:bg-slate-700/30" />
+                </div>
               </div>
+            ))}
+          </div>
+        ) : filteredSkills.length > 0 ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredSkills.map((group, i) => (
+              <div
+                key={group.category || i}
+                className="reveal card-hover glass p-6 rounded-3xl flex flex-col justify-start"
+                style={{ transitionDelay: `${i * 60}ms` }}
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="w-2 h-2 rounded-full bg-[var(--accent)]" />
+                  <h3
+                    className="font-display text-base font-bold"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    {group.category}
+                  </h3>
+                </div>
 
-              {/* Skill Pills */}
-              <div className="flex flex-wrap gap-2">
-                {group.items.map((item) => {
-                  const Icon = getSkillIcon(item);
-                  const brandColor = getSkillColor(item);
+                {/* Skill Pills */}
+                <div className="flex flex-wrap gap-2">
+                  {(group.items || []).map((item) => {
+                    const Icon = getSkillIcon(item);
+                    const brandColor = getSkillColor(item);
 
-                  return (
-                    <span
-                      key={item}
-                      className="pill-hover group inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-xl border transition-all"
-                      style={{
-                        borderColor: "var(--glass-border)",
-                        background: "var(--glass-bg)",
-                        color: "var(--text-primary)",
-                      }}
-                    >
+                    return (
                       <span
-                        className="transition-transform group-hover:scale-110"
-                        style={{ color: brandColor }}
+                        key={item}
+                        className="pill-hover group inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-xl border transition-all"
+                        style={{
+                          borderColor: "var(--glass-border)",
+                          background: "var(--glass-bg)",
+                          color: "var(--text-primary)",
+                        }}
                       >
-                        <Icon size={14} />
+                        <span
+                          className="transition-transform group-hover:scale-110"
+                          style={{ color: brandColor }}
+                        >
+                          <Icon size={14} />
+                        </span>
+                        <span>{item}</span>
                       </span>
-                      <span>{item}</span>
-                    </span>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 glass rounded-3xl p-8 max-w-md mx-auto">
+            <FiLayers size={32} className="mx-auto mb-3 text-[var(--text-muted)] opacity-60" />
+            <p className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
+              No skills found in this category.
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );
